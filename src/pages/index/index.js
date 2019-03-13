@@ -1,8 +1,7 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Button, Image } from '@tarojs/components'
-// import CanvasDrawer from '../../component/taro-plugin-canvas';
+import TaroCanvasDrawer from '../../component/taro-plugin-canvas';
 
-import {TaroCanvasDrawer} from '../../../dist/index';
 
 import './index.scss'
 
@@ -336,7 +335,6 @@ export default class Index extends Component {
             color: '#666',
             opacity: 1,
             baseLine: 'middle',
-            zIndex: 999,
             textAlign: 'left',
             lineHeight: 36,
             lineNum: 1,
@@ -350,7 +348,6 @@ export default class Index extends Component {
             color: '#666',
             opacity: 1,
             baseLine: 'middle',
-            zIndex: 999,
             textAlign: 'left',
             lineHeight: 36,
             lineNum: 1,
