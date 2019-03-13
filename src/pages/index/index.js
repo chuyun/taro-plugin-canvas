@@ -1,101 +1,10 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Button, Image } from '@tarojs/components'
-import CanvasDrawer from '../../component/taro-plugin-canvas';
+// import CanvasDrawer from '../../component/taro-plugin-canvas';
+
+import {TaroCanvasDrawer} from '../../../dist/index';
 
 import './index.scss'
-
-const DrawerDataTemp = {
-  width: 750,
-  height: 750,
-  clear: true,
-  views: [
-    {
-      type: 'rect',
-      background: '#EFF3F5',
-      top: 0,
-      left: 0,
-      width: 750,
-      height: 750,
-    },
-    {
-      type: 'rect',
-      background: '#fff',
-      top: 40,
-      left: 40,
-      width: 670,
-      height: 670,
-      borderRadius: 12,
-    },
-    {
-      type: 'image',
-      // pic url
-      url: 'https://images.ifanr.cn/wp-content/uploads/2018/08/pexels_photo_9.jpg',
-      top: 40,
-      left: 40,
-      width: 670,
-      height: 320,
-    },
-    {
-      type: 'text',
-      // 标题
-      content: '涨完房租又遇中介爆仓,这届年轻人真惨拉萨的卡萨涨完房租又遇中介爆仓这届年轻人真惨拉萨的卡萨',
-      fontSize: 32,
-      lineHeight: 48,
-      MaxLineNumber: 2,
-      color: '#000',
-      textAlign: 'left',
-      width: 580,
-      maxWidth: 590,
-      top: 400,
-      left: 80,
-      bolder: false,
-      breakWord: true,
-    },
-    {
-      type: 'rect',
-      top: 540,
-      left: 80,
-      width: 590,
-      height: 1,
-      background: '#eee',
-    },
-    {
-      type: 'text',
-      content: '长按扫描二维码阅读完整内容',
-      fontSize: 24,
-      lineHeight: 36,
-      MaxLineNumber: 1,
-      color: '#666',
-      textAlign: 'left',
-      top: 590,
-      left: 80,
-      bolder: false,
-      breakWord: true,
-    },
-    {
-      type: 'text',
-      content: '分享来自 「 RssFeed 」',
-      fontSize: 24,
-      lineHeight: 36,
-      MaxLineNumber: 1,
-      color: '#666',
-      textAlign: 'left',
-      top: 640,
-      left: 80,
-      bolder: false,
-      breakWord: true,
-    },
-    {
-      type: 'image',
-      // 文章链接url
-      url: 'https://pic.juncao.cc/cms/images/minapp.jpg',
-      top: 570,
-      left: 560,
-      width: 110,
-      height: 110,
-    },
-  ],
-};
 
 export default class Index extends Component {
 
@@ -407,7 +316,7 @@ export default class Index extends Component {
         texts: [
           {
             x: 80,
-            y: 400,
+            y: 420,
             text: '涨完房租又遇中介爆仓,这届年轻人真惨拉萨的卡萨涨完房租又遇中介爆仓这届年轻人真惨拉萨的卡萨',
             fontSize: 32,
             color: '#000',
@@ -484,6 +393,104 @@ export default class Index extends Component {
         ]
 
       },
+      wxConfig: {
+        width: 750,
+        height: 1624,
+        backgroundColor: '#F2F3F2',
+        debug: false,
+        blocks: [
+          {
+            x: 20,
+            y: 80,
+            width: 710,
+            height: 1520,
+            paddingLeft: 0,
+            paddingRight: 0,
+            borderWidth: 2,
+            borderColor: '#E7E7E7',
+            backgroundColor: '#F2F3F2',
+            borderRadius: 60,
+          },
+          {
+            x: 20,
+            y: 800,
+            width: 710,
+            height: 804,
+            paddingLeft: 0,
+            paddingRight: 0,
+            backgroundColor: '#fff',
+            borderRadius: 60,
+          },
+          {
+            x: 20,
+            y: 800,
+            width: 710,
+            height: 20,
+            paddingLeft: 0,
+            paddingRight: 0,
+            backgroundColor: '#fff',
+            borderRadius: 0,
+          },
+        ],
+        texts: [
+          {
+            x: 380,
+            y: 660,
+            text: '京门风月',
+            fontSize: 48,
+            fontFamily:'STSong',
+            color: '#000',
+            opacity: 1,
+            baseLine: 'middle',
+            lineHeight: 48,
+            lineNum: 2,
+            textAlign: 'center',
+            width: 200,
+            zIndex: 999,
+          },
+          {
+            x: 380,
+            y: 720,
+            text: '测试赛',
+            fontFamily:'STSong',
+            fontSize: 32,
+            color: '#1B88ED',
+            opacity: 1,
+            baseLine: 'middle',
+            lineHeight: 48,
+            lineNum: 2,
+            textAlign: 'center',
+            width: 200,
+            zIndex: 999,
+          },
+        ],
+        images: [
+          {
+            url: 'https://pic.juncao.cc/temp/IMG_1294.JPG',
+            width: 290,
+            height: 420,
+            y: 170,
+            x: 230,
+            borderRadius:12,
+            zIndex: 10,
+            // borderRadius: 150,
+            // borderWidth: 10,
+            // borderColor: 'red',
+          },
+
+        ],
+        lines: [
+          {
+            startY: 540,
+            startX: 80,
+            endX: 670,
+            endY: 541,
+            width: 1,
+            color: '#eee',
+          }
+
+        ],
+      }
     }
   }
 
@@ -572,13 +579,13 @@ export default class Index extends Component {
           />
           {
             this.state.canvasStatus &&
-            (<CanvasDrawer
+            (<TaroCanvasDrawer
               painting={this.state.painting}
               config={this.state.config}
               onCreateSuccess={this.onCreateSuccess}
               onCreateFail={this.onCreateFail}
             >
-            </CanvasDrawer>)
+            </TaroCanvasDrawer>)
           }
         </View>
 
@@ -587,6 +594,7 @@ export default class Index extends Component {
             <Button onClick={this.saveSharCardFuc.bind(this,this.state.rssConfig)} disabled={this.state.shareImage}>绘制1</Button>
             <Button onClick={this.saveSharCardFuc.bind(this,this.state.jdConfig)} disabled={this.state.shareImage}>绘制2</Button>
             <Button onClick={this.saveSharCardFuc.bind(this,this.state.demoConfig)} disabled={this.state.shareImage}>绘制3</Button>
+            <Button onClick={this.saveSharCardFuc.bind(this,this.state.wxConfig)} disabled={this.state.shareImage}>绘制4</Button>
           </View>
           <View className='flex-row'>
           <Button onClick={this.saveToAlbum}>保存到相册</Button>
