@@ -1,7 +1,7 @@
 import Taro, { Component } from '@tarojs/taro';
 import PropTypes from 'prop-types';
 import { Canvas } from '@tarojs/components';
-import './index.scss';
+import './index.css';
 
 export default class CanvasDrawer extends Component {
   static defaultProps = {};
