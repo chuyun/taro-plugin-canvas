@@ -2,11 +2,10 @@
   "name": "taro-plugin-canvas",
   "version": "1.0.0",
   "main": "dist/index.js",
-  "private": true,
   "description": "基于 Taro 框架的微信小程序 canvas 绘图组件，封装了常用的操作，通过配置的方式生成分享图片",
   "keywords": [
 		"taro",
-		"canvas",
+		"canvas"
 	],
 	"repository": {
 		"type": "git",
