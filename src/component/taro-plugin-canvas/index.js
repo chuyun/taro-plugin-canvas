@@ -1,379 +1,610 @@
 import Taro, { Component } from '@tarojs/taro';
 import PropTypes from 'prop-types';
-import { Canvas, View } from '@tarojs/components';
+import { Canvas, } from '@tarojs/components';
 import './index.scss';
-
-let inter = null;
 
 export default class CanvasDrawer extends Component {
   static defaultProps = {};
   static propTypes = {
+    config: PropTypes.object.isRequired,
     painting: PropTypes.object,
     onGetImage: PropTypes.func,
+    onCreateSuccess: PropTypes.func,
+    onCreateFail: PropTypes.func,
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      showCanvas: false,
-      width: 100,
-      height: 100,
-      tempFileList: [],
-      isPainting: false,
+      // showCanvas: false,
+      pxWidth: 0,
+      pxHeight: 0,
+      debug: false,
+      factor: 0,
+      hideLoading: false,
+      downloadStatus: null,
+
     }
     this.ctx = null;
     this.cache = {};
+    this.drawArr = [];
+
   }
 
   componentWillMount() {
-    console.log('componentWillMount')
+
   }
 
   componentDidMount() {
-    console.log('componentDidMount')
-    Taro.removeStorageSync('canvasdrawer_pic_cache')
-    this.cache = Taro.getStorageSync('canvasdrawer_pic_cache') || {}
-    this.ctx = Taro.createCanvasContext('canvasdrawer', this.$scope)
-    // setTimeout(()=>this.readyPigment(),1000);
-    this.readyPigment();
+    const sysInfo = Taro.getSystemInfoSync();
+    const screenWidth = sysInfo.screenWidth;
+    this.setState({
+      factor: screenWidth / 750
+    })
+    // Taro.removeStorageSync('canvasdrawer_pic_cache')
+    // this.cache = Taro.getStorageSync('canvasdrawer_pic_cache') || {}
+    // this.ctx = Taro.createCanvasContext('canvasdrawer', this.$scope);
+    this.onCreate();
   }
 
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.painting === null) {
-      return false
-    }
+  // componentWillReceiveProps(nextProps) {
+  //   // if (nextProps.painting === null) {
+  //   //   return false
+  //   // }
+  // }
+  // shouldComponentUpdate(nextProps, nextState) {
+  // }
 
-  }
-  shouldComponentUpdate(nextProps, nextState) {
-  }
+  // componentWillUpdate(nextProps, nextState) {
 
-  componentWillUpdate(nextProps, nextState) {
+  // }
 
-  }
+  // componentDidUpdate(prevProps, prevState) {
 
-  componentDidUpdate(prevProps, prevState) {
-
-  }
+  // }
 
   componentWillUnmount() {
-    clearInterval(inter);
-    inter = null;
+
   }
 
 
-  readyPigment() {
-    console.log('readyPigment');
-    console.log(this.ctx);
-
-    inter = setInterval(() => {
-      console.log(this.props.painting)
-      if (this.ctx && this.props.painting) {
-        const { width, height, views } = this.props.painting
-        this.setState({
-          width,
-          height,
-          showCanvas: true,
-          isPainting: true,
-        })
-        console.log("this.ctx");
-        clearInterval(inter)
-        this.ctx.clearActions()
-        this.ctx.save()
-        this.getImagesInfo(views)
-      }
-    }, 100)
-  };
-
-  getImagesInfo(views) {
-    const imageList = []
-    for (let i = 0; i < views.length; i++) {
-      if (views[i].type === 'image') {
-        imageList.push(this.getImageInfo(views[i].url))
-      }
+  toPx = (rpx, int, ) => {
+    const { factor } = this.state;
+    if (int) {
+      return parseInt(rpx * factor);
     }
-
-    const loadTask = []
-    for (let i = 0; i < Math.ceil(imageList.length / 8); i++) {
-      loadTask.push(new Promise((resolve, reject) => {
-        Promise.all(imageList.splice(i * 8, 8)).then(res => {
-          resolve(res)
-        }).catch(res => {
-          reject(res)
-        })
-      }))
+    return rpx * factor;
+  }
+  toRpx = (px, int, ) => {
+    const { factor } = this.state;
+    if (int) {
+      return parseInt(px / factor);
     }
-    Promise.all(loadTask).then(res => {
-      let tempFileList = []
-      for (let i = 0; i < res.length; i++) {
-        tempFileList = tempFileList.concat(res[i])
-      }
-      console.log(tempFileList);
-      this.setState({
-        tempFileList,
-      })
-      return tempFileList
-    }).then((tempFileList) => {
-      this.startPainting({
-        tempFileList
-      })
-    })
-  };
+    return px / factor;
+  }
 
-  startPainting(data) {
-    let tempFileList;
-    if (this.state.tempFileList.length <= 0) {
-      tempFileList = data.tempFileList
+  /**
+    * 画圆角矩形
+    */
+  _drawRadiusRect = (x, y, w, h, r) => {
+    const br = r / 2;
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.toPx(x + br), this.toPx(y));    // 移动到左上角的点
+    this.ctx.lineTo(this.toPx(x + w - br), this.toPx(y));
+    this.ctx.arc(this.toPx(x + w - br), this.toPx(y + br), this.toPx(br), 2 * Math.PI * (3 / 4), 2 * Math.PI * (4 / 4))
+    this.ctx.lineTo(this.toPx(x + w), this.toPx(y + h - br));
+    this.ctx.arc(this.toPx(x + w - br), this.toPx(y + h - br), this.toPx(br), 0, 2 * Math.PI * (1 / 4))
+    this.ctx.lineTo(this.toPx(x + br), this.toPx(y + h));
+    this.ctx.arc(this.toPx(x + br), this.toPx(y + h - br), this.toPx(br), 2 * Math.PI * (1 / 4), 2 * Math.PI * (2 / 4))
+    this.ctx.lineTo(this.toPx(x), this.toPx(y + br));
+    this.ctx.arc(this.toPx(x + br), this.toPx(y + br), this.toPx(br), 2 * Math.PI * (2 / 4), 2 * Math.PI * (3 / 4))
+  }
+  /**
+   * 计算文本长度
+   * @param {Array|Object}} text 数组 或者 对象
+   */
+  _getTextWidth = (text) => {
+    let texts = [];
+    if (Object.prototype.toString.call(text) === '[object Object]') {
+      texts.push(text);
     } else {
-      tempFileList = this.state.tempFileList;
+      texts = text;
     }
-    const { painting: { views } } = this.props;
-    console.log(views)
-    for (let i = 0, imageIndex = 0; i < views.length; i++) {
-      if (views[i].type === 'image') {
-        try {
-          console.log(tempFileList);
-          this.drawImage({
-            ...views[i],
-            url: tempFileList[imageIndex]
-          })
-        } catch (e) {
-          console.log(e);
+    let width = 0;
+    texts.forEach(({ fontSize, text, marginLeft = 0, marginRight = 0 }) => {
+      this.ctx.setFontSize(this.toPx(fontSize));
+      width += this.ctx.measureText(text).width + marginLeft + marginRight;
+    })
+
+    return this.toRpx(width);
+  }
+
+  /**
+   * 渲染一段文字
+   */
+  _drawSingleText = ({ x, y, fontSize, color, baseLine, textAlign = 'left', text, opacity = 1, textDecoration = 'none',
+    width, lineNum = 1, lineHeight = 0, fontWeight = 'normal', fontStyle = 'normal', fontFamily = "sans-serif" }) => {
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.font = fontStyle + " " + fontWeight + " " + this.toPx(fontSize, true) + "px " + fontFamily
+    this.ctx.setGlobalAlpha(opacity);
+    // this.ctx.setFontSize(this.toPx(fontSize));
+    this.ctx.setFillStyle(color);
+    this.ctx.setTextBaseline(baseLine);
+    this.ctx.setTextAlign(textAlign);
+    let textWidth = this.toRpx(this.ctx.measureText(text).width);
+    const textArr = [];
+    if (textWidth > width) {
+      // 文本宽度 大于 渲染宽度
+      const unitTextWidth = +(textWidth / text.length).toFixed(2);
+      const unitLineNum = parseInt(width / unitTextWidth);  // 一行文本数量
+      for (let i = 0; i <= text.length; i += unitLineNum) {  // 将文字转为数组，一行文字一个元素
+        const resText = text.slice(i, i + unitLineNum);
+        resText !== '' && textArr.push(resText);
+        if (textArr.length === lineNum) {
+          break;
         }
-        imageIndex++
-      } else if (views[i].type === 'text') {
-        if (!this.ctx.measureText) {
-          Taro.showModal({
-            title: '提示',
-            content: '当前微信版本过低，无法使用 measureText 功能，请升级到最新微信版本后重试。'
-          })
-          this.props.onGetImage({
-            errMsg: 'canvasdrawer:version too low'
-          })
-          // this.triggerEvent('getImage', {errMsg: 'canvasdrawer:version too low'})
-          return
-        } else {
-          this.drawText(views[i])
-        }
-      } else if (views[i].type === 'rect') {
-        this.drawRect(views[i])
       }
+      if (textArr.length * unitLineNum < text.length) {
+        const moreTextWidth = this.ctx.measureText('...').width;
+        const moreTextNum = Math.ceil(moreTextWidth / unitTextWidth);
+        const reg = new RegExp(`.{${moreTextNum}}$`);
+        textArr[textArr.length - 1] = textArr[textArr.length - 1].replace(reg, '...');
+      }
+      textWidth = width;
+    } else {
+      textArr.push(text);
     }
-    this.ctx.draw(false, () => {
-      console.log('this.ctx.draw');
-      Taro.setStorageSync('canvasdrawer_pic_cache', this.cache)
-      const system = Taro.getSystemInfoSync().system
-      if (/ios/i.test(system)) {
-        this.saveImageToLocal()
+
+    textArr.forEach((item, index) => {
+      this.ctx.fillText(item, this.toPx(x), this.toPx(y + (lineHeight || fontSize) * index));
+    })
+
+    this.ctx.restore();
+
+    // textDecoration
+    if (textDecoration !== 'none') {
+      let lineY = y;
+      if (textDecoration === 'line-through') {
+        // 目前只支持贯穿线
+        lineY = y;
+      }
+      this.ctx.save();
+      this.ctx.moveTo(this.toPx(x), this.toPx(lineY));
+      this.ctx.lineTo(this.toPx(x) + this.toPx(textWidth), this.toPx(lineY));
+      this.ctx.setStrokeStyle(color);
+      this.ctx.stroke();
+      this.ctx.restore();
+    }
+
+    return textWidth;
+  }
+
+  // ----------
+
+  /**
+   * 渲染块
+   * @param {Object} params
+   */
+  drawBlock = ({ text, width = 0, height, x, y, paddingLeft = 0, paddingRight = 0, borderWidth, backgroundColor, borderColor, borderRadius = 0, opacity = 1 }) => {
+    // 判断是否块内有文字
+    let blockWidth = 0; // 块的宽度
+    let textX = 0;
+    let textY = 0;
+    if (typeof text !== 'undefined') {
+      // 如果有文字并且块的宽度小于文字宽度，块的宽度为 文字的宽度 + 内边距
+      const textWidth = this._getTextWidth(typeof text.text === 'string' ? text : text.text);
+      blockWidth = textWidth > width ? textWidth : width;
+      blockWidth += paddingLeft + paddingLeft;
+
+      const { textAlign = 'left', text: textCon } = text;
+      textY = height / 2 + y; // 文字的y轴坐标在块中线
+      if (textAlign === 'left') {
+        // 如果是右对齐，那x轴在块的最左边
+        textX = x + paddingLeft;
+      } else if (textAlign === 'center') {
+        textX = blockWidth / 2 + x;
       } else {
-        // 延迟保存图片，解决安卓生成图片错位bug。
-        setTimeout(() => {
-          this.saveImageToLocal()
-        }, 800)
+        textX = x + blockWidth - paddingRight;
       }
-    })
-  };
-
-  drawImage(params) {
-    this.ctx.save()
-    const {
-      url,
-      top = 0,
-      left = 0,
-      width = 0,
-      height = 0,
-      borderRadius = 0,
-      deg = 0,
-    } = params
-    // if (borderRadius) {
-    //   this.ctx.beginPath()
-    //   this.ctx.arc(left + borderRadius, top + borderRadius, borderRadius, 0, 2 * Math.PI)
-    //   this.ctx.clip()
-    //   this.ctx.drawImage(url, left, top, width, height)
-    // } else {
-    if (deg !== 0) {
-      this.ctx.translate(left + width / 2, top + height / 2)
-      this.ctx.rotate(deg * Math.PI / 180)
-      this.ctx.drawImage(url, -width / 2, -height / 2, width, height)
     } else {
-      try {
-        console.log(params)
-        console.log(url)
-        this.ctx.drawImage(url, left, top, width, height)
-      } catch (err) {
-        console.log(err);
-      }
+      blockWidth = width;
     }
-    // }
-    this.ctx.restore()
-  };
 
-  drawText(params) {
-    this.ctx.save()
-    const {
-      MaxLineNumber = 2,
-      breakWord = false,
-      color = 'black',
-      content = '',
-      fontSize = 16,
-      top = 0,
-      left = 0,
-      lineHeight = 20,
-      textAlign = 'left',
-      width,
-      bolder = false,
-      textDecoration = 'none'
-    } = params
+    if (backgroundColor) {
+      // 画面
+      this.ctx.save();
+      this.ctx.setGlobalAlpha(opacity);
+      this.ctx.setFillStyle(backgroundColor);
+      if (borderRadius > 0) {
+        // 画圆角矩形
+        this._drawRadiusRect(x, y, blockWidth, height, borderRadius);
+        this.ctx.fill();
+      } else {
+        this.ctx.fillRect(this.toPx(x), this.toPx(y), this.toPx(blockWidth), this.toPx(height));
+      }
+      this.ctx.restore();
+    }
+    if (borderWidth) {
+      // 画线
+      this.ctx.save();
+      this.ctx.setGlobalAlpha(opacity);
+      this.ctx.setStrokeStyle(borderColor);
+      this.ctx.setLineWidth(this.toPx(borderWidth));
+      if (borderRadius > 0) {
+        // 画圆角矩形边框
+        this._drawRadiusRect(x, y, blockWidth, height, borderRadius);
+        this.ctx.stroke();
+      } else {
+        this.ctx.strokeRect(this.toPx(x), this.toPx(y), this.toPx(blockWidth), this.toPx(height));
+      }
+      this.ctx.restore();
+    }
 
-    this.ctx.beginPath()
-    this.ctx.setTextBaseline('top')
-    this.ctx.setTextAlign(textAlign)
-    this.ctx.setFillStyle(color)
-    this.ctx.setFontSize(fontSize)
+    if (text) {
+      this.drawText(Object.assign(text, { x: textX, y: textY }))
+    }
+  }
 
-    if (!breakWord) {
-      this.ctx.fillText(content, left, top)
-      this.drawTextLine(left, top, textDecoration, color, fontSize, content)
+  /**
+   * 渲染文字
+   * @param {Object} params
+   */
+  drawText = (params) => {
+    const { x, y, fontSize, color, baseLine, textAlign, text, opacity = 1, width, lineNum, lineHeight } = params;
+    if (Object.prototype.toString.call(text) === '[object Array]') {
+      let preText = { x, y, baseLine };
+      text.forEach(item => {
+        preText.x += item.marginLeft || 0;
+        const textWidth = this._drawSingleText(Object.assign(item, {
+          ...preText,
+        }));
+        preText.x += textWidth + (item.marginRight || 0); // 下一段字的x轴为上一段字x + 上一段字宽度
+      })
     } else {
-      let fillText = ''
-      let fillTop = top
-      let lineNum = 1
-      for (let i = 0; i < content.length; i++) {
-        fillText += [content[i]]
-        if (this.ctx.measureText(fillText).width > width) {
-          if (lineNum === MaxLineNumber) {
-            if (i !== content.length) {
-              fillText = fillText.substring(0, fillText.length - 1) + '...'
-              this.ctx.fillText(fillText, left, fillTop)
-              this.drawTextLine(left, fillTop, textDecoration, color, fontSize, fillText)
-              fillText = ''
-              break
-            }
-          }
-          this.ctx.fillText(fillText, left, fillTop)
-          this.drawTextLine(left, fillTop, textDecoration, color, fontSize, fillText)
-          fillText = ''
-          fillTop += lineHeight
-          lineNum++
-        }
+      this._drawSingleText(params);
+    }
+  }
+
+  /**
+   * 渲染图片
+   */
+  drawImage = (data) => {
+    const { imgPath, x, y, w, h, sx, sy, sw, sh, borderRadius = 0, borderWidth = 0, borderColor } = data;
+    this.ctx.save();
+    if (borderRadius > 0) {
+      this._drawRadiusRect(x, y, w, h, borderRadius);
+      this.ctx.clip();
+      this.ctx.drawImage(imgPath, this.toPx(sx), this.toPx(sy), this.toPx(sw), this.toPx(sh), this.toPx(x), this.toPx(y), this.toPx(w), this.toPx(h));
+      if (borderWidth > 0) {
+        this.ctx.setStrokeStyle(borderColor);
+        this.ctx.setLineWidth(this.toPx(borderWidth));
+        this.ctx.stroke();
       }
-      this.ctx.fillText(fillText, left, fillTop)
-      this.drawTextLine(left, fillTop, textDecoration, color, fontSize, fillText)
+    } else {
+      this.ctx.drawImage(imgPath, this.toPx(sx), this.toPx(sy), this.toPx(sw), this.toPx(sh), this.toPx(x), this.toPx(y), this.toPx(w), this.toPx(h));
     }
-
-    this.ctx.restore()
-
-    if (bolder) {
-      this.drawText({
-        ...params,
-        left: left + 0.3,
-        top: top + 0.3,
-        bolder: false,
-        textDecoration: 'none'
-      })
-    }
-  };
-
-  drawTextLine(left, top, textDecoration, color, fontSize, content) {
-    if (textDecoration === 'underline') {
-      this.drawRect({
-        background: color,
-        top: top + fontSize * 1.2,
-        left: left - 1,
-        width: this.ctx.measureText(content).width + 3,
-        height: 1
-      })
-    } else if (textDecoration === 'line-through') {
-      this.drawRect({
-        background: color,
-        top: top + fontSize * 0.6,
-        left: left - 1,
-        width: this.ctx.measureText(content).width + 3,
-        height: 1
-      })
-    }
-  };
-
-  drawRect(params) {
-    this.ctx.save()
-    const { background, top = 0, left = 0, width = 0, height = 0 } = params
-    this.ctx.setFillStyle(background)
-    this.ctx.fillRect(left, top, width, height)
-    this.ctx.restore()
-  };
-
-  getImageInfo(url) {
+    this.ctx.restore();
+  }
+  /**
+   * 渲染线
+   * @param {*} param0
+   */
+  drawLine = ({ startX, startY, endX, endY, color, width }) => {
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.setStrokeStyle(color);
+    this.ctx.setLineWidth(this.toPx(width));
+    this.ctx.moveTo(this.toPx(startX), this.toPx(startY));
+    this.ctx.lineTo(this.toPx(endX), this.toPx(endY));
+    this.ctx.stroke();
+    this.ctx.closePath();
+    this.ctx.restore();
+  }
+  /**
+  * 下载图片并获取图片信息
+  */
+  _downloadImageAndInfo = (image, index) => {
     return new Promise((resolve, reject) => {
-      if (this.cache[url]) {
-        resolve(this.cache[url])
-      } else {
-        const objExp = new RegExp(/^http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/)
-        if (objExp.test(url)) {
-          Taro.getImageInfo({
-            src: url,
-            complete: res => {
-              if (res.errMsg === 'getImageInfo:ok') {
-                this.cache[url] = res.path
-                resolve(res.path)
-              } else {
-                this.props.onGetImage({
-                  errMsg: 'canvasdrawer:download fail'
-                })
-                // this.triggerEvent('getImage', {errMsg: 'canvasdrawer:download fail'})
-                reject(new Error('getImageInfo fail'))
-              }
+      const { x, y, url, zIndex } = image;
+      const imageUrl = url;
+      // 下载图片
+      this._downImage(imageUrl, index)
+        // 获取图片信息
+        .then(imgPath => this._getImageInfo(imgPath, index))
+        .then(({ imgPath, imgInfo }) => {
+          // 根据画布的宽高计算出图片绘制的大小，这里会保证图片绘制不变形
+          let sx;
+          let sy;
+          const borderRadius = image.borderRadius || 0;
+          const setWidth = image.width;
+          const setHeight = image.height;
+          const width = this.toRpx(imgInfo.width);
+          const height = this.toRpx(imgInfo.height);
+
+          if (width / height <= setWidth / setHeight) {
+            sx = 0;
+            sy = (height - ((width / setWidth) * setHeight)) / 2;
+          } else {
+            sy = 0;
+            sx = (width - ((height / setHeight) * setWidth)) / 2;
+          }
+          this.drawArr.push({
+            type: 'image',
+            borderRadius,
+            borderWidth: image.borderWidth,
+            borderColor: image.borderColor,
+            zIndex: typeof zIndex !== 'undefined' ? zIndex : index,
+            imgPath,
+            sx,
+            sy,
+            sw: (width - (sx * 2)),
+            sh: (height - (sy * 2)),
+            x,
+            y,
+            w: setWidth,
+            h: setHeight,
+          });
+          resolve();
+        })
+        .catch(err => reject(err));
+    });
+  }
+
+  /**
+   * 下载图片资源
+   * @param {*} imageUrl
+   */
+  _downImage = (imageUrl) => {
+    return new Promise((resolve, reject) => {
+      if (/^http/.test(imageUrl) && !new RegExp(wx.env.USER_DATA_PATH).test(imageUrl)) {
+        Taro.downloadFile({
+          url: (imageUrl),
+          // url: this._mapHttpToHttps(imageUrl),
+          success: (res) => {
+            if (res.statusCode === 200) {
+              resolve(res.tempFilePath);
+            } else {
+              reject(res.errMsg);
             }
-          })
+          },
+          fail(err) {
+            reject(err);
+          },
+        });
+      } else {
+        // 支持本地地址
+        resolve(imageUrl);
+      }
+    });
+  }
+  /**
+   * 获取图片信息
+   * @param {*} imgPath
+   * @param {*} index
+   */
+  _getImageInfo = (imgPath, index) => {
+    return new Promise((resolve, reject) => {
+      Taro.getImageInfo({
+        src: imgPath,
+        success(res) {
+          resolve({ imgPath, imgInfo: res, index });
+        },
+        fail(err) {
+          reject(err);
+        },
+      });
+    });
+  }
+
+  /**
+   * 将http转为https
+   * @param {String}} rawUrl 图片资源url
+   */
+  _mapHttpToHttps = (rawUrl) => {
+    if (rawUrl.indexOf(':') < 0) {
+      return rawUrl;
+    }
+    const urlComponent = rawUrl.split(':');
+    if (urlComponent.length === 2) {
+      if (urlComponent[0] === 'http') {
+        urlComponent[0] = 'https';
+        return `${urlComponent[0]}:${urlComponent[1]}`;
+      }
+    }
+    return rawUrl;
+  }
+
+  downloadResource = (images = []) => {
+    const drawList = [];
+    images.forEach((image, index) => drawList.push(this._downloadImageAndInfo(image, index)));
+    return Promise.all(drawList);
+  }
+
+  downloadResource222 = (reset) => {
+    return new Promise((resolve, reject) => {
+      if (reset) {
+        this.setState({
+          downloadStatus: null
+        })
+      }
+      if (this.state.downloadStatus && this.state.downloadStatus !== 'fail') {
+        if (this.state.downloadStatus === 'success') {
+          resolve();
         } else {
-          this.cache[url] = url
-          resolve(url)
+          // TODO
+          // this.once('downloadSuccess', () => resolve());
+          // this.once('downloadFail', (e) => reject(e));
         }
+      } else {
+        this.downloadResource(this.props.config.images)
+          .then(() => {
+            this.setState({
+              downloadStatus: 'success'
+            })
+            resolve();
+          })
+          .catch((e) => reject(e));
       }
     })
-  };
+  }
 
-  saveImageToLocal() {
-    const { width, height } = this.state;
-    Taro.canvasToTempFilePath({
-      x: 0,
-      y: 0,
-      width,
-      height,
-      canvasId: 'canvasdrawer',
-      complete: res => {
-        console.log(res);
-        if (res.errMsg === 'canvasToTempFilePath:ok') {
-          this.setState({
-            showCanvas: false,
-            isPainting: false,
-            tempFileList: []
-          })
-          this.props.onGetImage({
-            tempFilePath: res.tempFilePath,
-            errMsg: 'canvasdrawer:ok'
-          })
-          // this.triggerEvent('getImage', {tempFilePath: res.tempFilePath, errMsg: 'canvasdrawer:ok'})
-        } else {
-          this.props.onGetImage({
-            errMsg: 'canvasdrawer:fail'
-          })
-          // this.triggerEvent('getImage', {errMsg: 'canvasdrawer:fail'})
-        }
+  getHeight = (config) => {
+    const getTextHeight = (text) => {
+      let fontHeight = text.lineHeight || text.fontSize;
+      let height = 0;
+      if (text.baseLine === 'top') {
+        height = fontHeight;
+      } else if (text.baseLine === 'middle') {
+        height = fontHeight / 2;
+      } else {
+        height = 0;
       }
-    }, this.$scope)
+      return height;
+    }
+    const heightArr = [];
+    (config.blocks || []).forEach((item) => {
+      heightArr.push(item.y + item.height);
+    });
+    (config.texts || []).forEach((item) => {
+      let height;
+      if (Object.prototype.toString.call(item.text) === '[object Array]') {
+        item.text.forEach((i) => {
+          height = getTextHeight({ ...i, baseLine: item.baseLine });
+          heightArr.push(item.y + height);
+        });
+      } else {
+        height = getTextHeight(item);
+        heightArr.push(item.y + height);
+      }
+    });
+    (config.images || []).forEach((item) => {
+      heightArr.push(item.y + item.height);
+    });
+    (config.lines || []).forEach((item) => {
+      heightArr.push(item.startY);
+      heightArr.push(item.endY);
+    });
+    const sortRes = heightArr.sort((a, b) => b - a);
+    let canvasHeight = 0;
+    if (sortRes.length > 0) {
+      canvasHeight = sortRes[0];
+    }
+    if (config.height < canvasHeight || !config.height) {
+      return canvasHeight;
+    } else {
+      return config.height;
+    }
+  }
+
+  initCanvas = (w, h, debug) => {
+    return new Promise((resolve) => {
+      this.setState({
+        pxWidth: this.toPx(w),
+        pxHeight: this.toPx(h),
+        debug,
+      }, resolve);
+    });
+  }
+
+  onCreate = (reset = false) => {
+    !this.state.hideLoading && Taro.showLoading({ mask: true, title: '生成中...' });
+    return this.downloadResource222(typeof reset === 'boolean' && reset).then(() => {
+      !this.state.hideLoading && Taro.hideLoading();
+      this.create(this.props.config);
+    })
+      .catch((err) => {
+        !this.state.hideLoading && Taro.hideLoading();
+        Taro.showToast({ icon: 'none', title: err.errMsg || '生成失败' });
+        console.error(err);
+        this.props.onCreateFail(err);
+      })
+  }
+
+  create = (config) => {
+    this.ctx = Taro.createCanvasContext('canvasdrawer', this.$scope);
+    const height = this.getHeight(config);
+
+    this.initCanvas(config.width, height, config.debug)
+      .then(() => {
+          // 设置画布底色
+          if (config.backgroundColor) {
+            this.ctx.save();
+            this.ctx.setFillStyle(config.backgroundColor);
+            this.ctx.fillRect(0, 0, this.toPx(config.width), this.toPx(height));
+            this.ctx.restore();
+          }
+          const { texts = [], images = [], blocks = [], lines = [] } = config;
+          const queue = this.drawArr
+            .concat(texts.map((item) => {
+              item.type = 'text';
+              item.zIndex = item.zIndex || 0;
+              return item;
+            }))
+            .concat(blocks.map((item) => {
+              item.type = 'block';
+              item.zIndex = item.zIndex || 0;
+              return item;
+            }))
+            .concat(lines.map((item) => {
+              item.type = 'line';
+              item.zIndex = item.zIndex || 0;
+              return item;
+            }));
+          // 按照顺序排序
+          queue.sort((a, b) => a.zIndex - b.zIndex);
+
+          queue.forEach((item) => {
+            if (item.type === 'image') {
+              this.drawImage(item)
+            } else if (item.type === 'text') {
+              this.drawText(item)
+            } else if (item.type === 'block') {
+              this.drawBlock(item)
+            } else if (item.type === 'line') {
+              this.drawLine(item)
+            }
+          });
+
+          const res = Taro.getSystemInfoSync();
+          const platform = res.platform;
+          let time = 0;
+          if (platform === 'android') {
+            // 在安卓平台，经测试发现如果海报过于复杂在转换时需要做延时，要不然样式会错乱
+            time = 300;
+          }
+          this.ctx.draw(false, () => {
+            setTimeout(() => {
+              Taro.canvasToTempFilePath({
+                canvasId: 'canvasdrawer',
+                success: (result) => {
+                  this.props.onCreateSuccess(result.tempFilePath);
+                },
+                fail: (err) => {
+                  this.props.onCreateFail(err);
+                },
+              }, this.$scope);
+            }, time);
+          });
+        })
+      .catch((err) => {
+        Taro.showToast({ icon: 'none', title: err.errMsg || '生成失败' });
+        console.error(err);
+      });
   }
 
   render() {
-    const { showCanvas, width, height } = this.state;
-    if (showCanvas) {
-      return (
-        <Canvas canvas-id='canvasdrawer'
-          style={`width:${width}px; height:${height}px;`}
-          className='board'
-        >
-        </Canvas >
-      )
-    }
+    const { pxWidth, pxHeight, debug } = this.state;
+
+    return (
+      <Canvas canvas-id='canvasdrawer'
+        style={`width:${pxWidth}px; height:${pxHeight}px;`}
+        className={`${debug ? 'debug' : 'pro'} canvas`}
+      >
+      </Canvas >
+    )
   }
+
 }
 
