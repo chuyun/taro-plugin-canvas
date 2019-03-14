@@ -11,11 +11,11 @@ taro-plugin-canvas 是基于 Taro 框架的微信小程序 canvas 绘图组件�
 本组件是基于 [wxa-plugin-canvas](https://github.com/jasondu/wxa-plugin-canvas) 的Taro封装版本
 
 ## 生成效果
-<img width="300" src="https://github.com/jasondu/taro-plugin-canvas/blob/master/src/assets/images/demo1.png"></img>
+<img width="300" src="https://github.com/chuyun/taro-plugin-canvas/blob/master/src/assets/images/demo1.png"></img>
 
-<img width="300" src="https://github.com/jasondu/taro-plugin-canvas/blob/master/src/assets/images/demo2.png"></img>
+<img width="300" src="https://github.com/chuyun/taro-plugin-canvas/blob/master/src/assets/images/demo2.png"></img>
 
-<img width="300" src="https://github.com/jasondu/taro-plugin-canvas/blob/master/src/assets/images/demo3.png"></img>
+<img width="300" src="https://github.com/chuyun/taro-plugin-canvas/blob/master/src/assets/images/demo3.png"></img>
 ## 组件原理说明
 参见 wxa-plugin-canvas => https://juejin.im/post/5b7e48566fb9a01a1059543f
 
