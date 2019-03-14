@@ -1,9 +1,9 @@
 # taro-plugin-canvas
 小程序组件-小程序海报组件
-   <a href="">
-   <img src="" alt="npm"></a>
-   <a href="">
-   <img src="" alt="npm"></a>
+   <a href="https://www.npmjs.com/package/taro-plugin-canvas">
+   <img src="https://img.shields.io/npm/v/taro-plugin-canvas.svg?style=flat" alt="npm"></a>
+   <a href="https://www.npmjs.com/package/taro-plugin-canvas">
+   <img src="https://img.shields.io/npm/dm/taro-plugin-canvas.svg?style=flat" alt="npm"></a>
 
 ## 概述
 taro-plugin-canvas 是基于 Taro 框架的微信小程序 canvas 绘图组件，封装了常用的操作，通过配置的方式生成分享图片
@@ -11,10 +11,13 @@ taro-plugin-canvas 是基于 Taro 框架的微信小程序 canvas 绘图组件�
 本组件是基于 [wxa-plugin-canvas](https://github.com/jasondu/wxa-plugin-canvas) 的Taro封装版本
 
 ## 生成效果
+<img width="300" src="https://github.com/jasondu/taro-plugin-canvas/blob/master/src/assets/images/demo1.png"></img>
 
+<img width="300" src="https://github.com/jasondu/taro-plugin-canvas/blob/master/src/assets/images/demo2.png"></img>
 
+<img width="300" src="https://github.com/jasondu/taro-plugin-canvas/blob/master/src/assets/images/demo3.png"></img>
 ## 组件原理说明
-
+参见 wxa-plugin-canvas => https://juejin.im/post/5b7e48566fb9a01a1059543f
 
 ## 使用之前
 
@@ -26,19 +29,51 @@ taro-plugin-canvas 是基于 Taro 框架的微信小程序 canvas 绘图组件�
 
 小程序已经支持使用 npm 安装第三方包，详见 [npm 支持](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html?search-key=npm)
 
-```
+``` bash
 # npm
 npm i taro-plugin-canvas -S --production
 
 # yarn
 yarn add taro-plugin-canvas --production
 ```
+## 使用组件
 
+```javascript
+// 引入代码
+import { TaroCanvasDrawer } from '../../component/taro-plugin-canvas';
+
+// 在 render 方法中调用
+<TaroCanvasDrawer
+  config={this.state.config}
+  onCreateSuccess={this.onCreateSuccess}
+  onCreateFail={this.onCreateFail}
+/>
+// 注意点 
+// config 绘图配置信息 - 必填项
+// onCreateSuccess 绘图成功回调 -可选
+// onCreateFail 绘图失败回调 - 可选
+```
+
+
+#### 方式二.下载代码
+
+直接通过 git 下载 taro-plugin-canvas 源代码，并将`src/component/taro-plugin-canvas`目录拷贝到自己的项目的 `src/component`目录中
+
+## 使用组件
+
+```javascript
+// 引入代码 *引入方式和上面的方式一略有不同
+import TaroCanvasDrawer from '../../component/taro-plugin-canvas';
+
+// 在 render 方法中调用 和方式一一样
+```
 
 
 ## 使用注意事项
 
 1. 图片的域名**务必**添加到downloadFile合法域名中（开发设置-服务器域名-downloadFile合法域名）
+【P.s 开发时可 选中不校验合法域名、web-view（业务域名）、TLS 版本以及 HTTPS 证书】
+【P.s 真机运行，可打开调试模式】
 
 ## 组件参数解释
 

@@ -393,8 +393,8 @@ export default class CanvasDrawer extends Component {
     return new Promise((resolve, reject) => {
       if (/^http/.test(imageUrl) && !new RegExp(wx.env.USER_DATA_PATH).test(imageUrl)) {
         Taro.downloadFile({
-          url: (imageUrl),
-          // url: this._mapHttpToHttps(imageUrl),
+          // url: (imageUrl),
+          url: this._mapHttpToHttps(imageUrl),
           success: (res) => {
             if (res.statusCode === 200) {
               resolve(res.tempFilePath);
@@ -561,8 +561,9 @@ export default class CanvasDrawer extends Component {
       this.create(this.props.config);
     })
       .catch((err) => {
+        console.log(err);
         !this.state.hideLoading && Taro.hideLoading();
-        Taro.showToast({ icon: 'none', title: err.errMsg || '生成失败' });
+        Taro.showToast({ icon: 'none', title: err.errMsg || '生成失败111' });
         console.error(err);
         this.props.onCreateFail(err);
       })
@@ -638,7 +639,7 @@ export default class CanvasDrawer extends Component {
           });
         })
       .catch((err) => {
-        Taro.showToast({ icon: 'none', title: err.errMsg || '生成失败' });
+        Taro.showToast({ icon: 'none', title: err.errMsg || '生成失败222' });
         console.error(err);
       });
   }

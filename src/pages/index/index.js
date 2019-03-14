@@ -2,7 +2,6 @@ import Taro, { Component } from '@tarojs/taro'
 import { View, Button, Image } from '@tarojs/components'
 import TaroCanvasDrawer from '../../component/taro-plugin-canvas';
 
-
 import './index.scss'
 
 export default class Index extends Component {
@@ -13,7 +12,6 @@ export default class Index extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      painting: null,
       config: null,
       shareImage: null,
       canvasStatus: false,
@@ -316,7 +314,7 @@ export default class Index extends Component {
           {
             x: 80,
             y: 420,
-            text: '涨完房租又遇中介爆仓,这届年轻人真惨拉萨的卡萨涨完房租又遇中介爆仓这届年轻人真惨拉萨的卡萨',
+            text: '国产谍战 真人演出,《隐形守护者》凭什么成为Steam第一?',
             fontSize: 32,
             color: '#000',
             opacity: 1,
@@ -356,12 +354,12 @@ export default class Index extends Component {
         ],
         images: [
           {
-            url: 'https://images.ifanr.cn/wp-content/uploads/2018/08/pexels_photo_9.jpg',
+            url: 'https://s3.ifanr.com/wp-content/uploads/2019/03/achievement_wanchengdu2l-1024x576.png',
             width: 670,
             height: 320,
             y: 40,
             x: 40,
-            borderRadius:12,
+            borderRadius: 12,
             zIndex: 10,
             // borderRadius: 150,
             // borderWidth: 10,
@@ -435,7 +433,7 @@ export default class Index extends Component {
             y: 660,
             text: '京门风月',
             fontSize: 48,
-            fontFamily:'STSong',
+            fontFamily: 'STSong',
             color: '#000',
             opacity: 1,
             baseLine: 'middle',
@@ -449,7 +447,7 @@ export default class Index extends Component {
             x: 380,
             y: 720,
             text: '测试赛',
-            fontFamily:'STSong',
+            fontFamily: 'STSong',
             fontSize: 32,
             color: '#1B88ED',
             opacity: 1,
@@ -468,7 +466,7 @@ export default class Index extends Component {
             height: 420,
             y: 170,
             x: 230,
-            borderRadius:12,
+            borderRadius: 12,
             zIndex: 10,
             // borderRadius: 150,
             // borderWidth: 10,
@@ -501,7 +499,7 @@ export default class Index extends Component {
 
   componentDidHide() { }
 
-  saveSharCardFuc = (config = this.state.rssConfig)   => {
+  saveSharCardFuc = (config = this.state.rssConfig) => {
     this.setState({
       canvasStatus: true,
       // painting:
@@ -558,7 +556,6 @@ export default class Index extends Component {
 
   reset = () => {
     this.setState({
-      painting: null,
       shareImage: null,
       canvasStatus: false,
     })
@@ -577,27 +574,24 @@ export default class Index extends Component {
           {
             this.state.canvasStatus &&
             (<TaroCanvasDrawer
-              painting={this.state.painting}
               config={this.state.config}
               onCreateSuccess={this.onCreateSuccess}
               onCreateFail={this.onCreateFail}
-            >
-            </TaroCanvasDrawer>)
+            />
+            )
           }
         </View>
-
         <View>
           <View className='flex-row'>
-            <Button onClick={this.saveSharCardFuc.bind(this,this.state.rssConfig)} disabled={this.state.shareImage}>绘制1</Button>
-            <Button onClick={this.saveSharCardFuc.bind(this,this.state.jdConfig)} disabled={this.state.shareImage}>绘制2</Button>
-            <Button onClick={this.saveSharCardFuc.bind(this,this.state.demoConfig)} disabled={this.state.shareImage}>绘制3</Button>
-            <Button onClick={this.saveSharCardFuc.bind(this,this.state.wxConfig)} disabled={this.state.shareImage}>绘制4</Button>
+            <Button onClick={this.saveSharCardFuc.bind(this, this.state.rssConfig)} disabled={this.state.shareImage}>绘制1</Button>
+            <Button onClick={this.saveSharCardFuc.bind(this, this.state.jdConfig)} disabled={this.state.shareImage}>绘制2</Button>
+            <Button onClick={this.saveSharCardFuc.bind(this, this.state.demoConfig)} disabled={this.state.shareImage}>绘制3</Button>
+            <Button onClick={this.saveSharCardFuc.bind(this, this.state.wxConfig)} disabled={this.state.shareImage}>绘制4</Button>
           </View>
           <View className='flex-row'>
-          <Button onClick={this.saveToAlbum}>保存到相册</Button>
-          <Button onClick={this.reset}>重置</Button>
+            <Button onClick={this.saveToAlbum}>保存到相册</Button>
+            <Button onClick={this.reset}>重置</Button>
           </View>
-
         </View>
       </View>
     )
