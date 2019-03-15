@@ -354,7 +354,7 @@ export default class Index extends Component {
         ],
         images: [
           {
-            url: 'https://s3.ifanr.com/wp-content/uploads/2019/03/achievement_wanchengdu2l-1024x576.png',
+            url: 'http://pic.juncao.cc/rssfeed/images/demo.png',
             width: 670,
             height: 320,
             y: 40,
