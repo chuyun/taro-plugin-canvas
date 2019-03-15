@@ -140,7 +140,8 @@ export default class CanvasDrawer extends Component {
     if (textWidth > width) {
       // 文本宽度 大于 渲染宽度
       const unitTextWidth = +(textWidth / text.length).toFixed(2);
-      const unitLineNum = parseInt(width / unitTextWidth);  // 一行文本数量
+      // const unitTextWidth = parseInt(+(textWidth / text.length));
+      const unitLineNum =  parseInt(width / unitTextWidth);  // 一行文本数量
       for (let i = 0; i <= text.length; i += unitLineNum) {  // 将文字转为数组，一行文字一个元素
         const resText = text.slice(i, i + unitLineNum);
         resText !== '' && textArr.push(resText);

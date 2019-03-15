@@ -1,6 +1,8 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Button, Image } from '@tarojs/components'
-import TaroCanvasDrawer from '../../component/taro-plugin-canvas';
+// import TaroCanvasDrawer from '../../component/taro-plugin-canvas';
+
+import { TaroCanvasDrawer } from 'taro-plugin-canvas';
 
 import './index.scss'
 
@@ -314,7 +316,7 @@ export default class Index extends Component {
           {
             x: 80,
             y: 420,
-            text: '国产谍战 真人演出,《隐形守护者》凭什么成为Steam第一?',
+            text: '国产谍战、真人演出，《隐形守护者》凭什么成为Steam第一？',
             fontSize: 32,
             color: '#000',
             opacity: 1,
@@ -354,7 +356,7 @@ export default class Index extends Component {
         ],
         images: [
           {
-            url: 'https://s3.ifanr.com/wp-content/uploads/2019/03/achievement_wanchengdu2l-1024x576.png',
+            url: 'http://pic.juncao.cc/rssfeed/images/demo.png',
             width: 670,
             height: 320,
             y: 40,
