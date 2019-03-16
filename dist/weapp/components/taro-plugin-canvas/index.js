@@ -555,6 +555,7 @@ export default class CanvasDrawer extends Component {
    * @param  { boolean } reset=false
    */
   onCreate = (reset = false) => {
+    const { onCreateFail } = this.props;
     !this.state.hideLoading && Taro.showLoading({ mask: true, title: '生成中...' });
     return this.downloadResourceTransit(typeof reset === 'boolean' && reset).then(() => {
       !this.state.hideLoading && Taro.hideLoading();
@@ -564,7 +565,7 @@ export default class CanvasDrawer extends Component {
         !this.state.hideLoading && Taro.hideLoading();
         Taro.showToast({ icon: 'none', title: err.errMsg || '生成失败' });
         console.error(err);
-        this.props.onCreateFail(err);
+        onCreateFail && onCreateFail(err);
       })
   }
 
@@ -572,6 +573,7 @@ export default class CanvasDrawer extends Component {
    * @param  { object } config
    */
   create = (config) => {
+    const { onCreateSuccess,onCreateFail} = this.props;
     this.ctx = Taro.createCanvasContext('canvasdrawer', this.$scope);
     const height = this.getHeight(config);
 
@@ -628,10 +630,10 @@ export default class CanvasDrawer extends Component {
               Taro.canvasToTempFilePath({
                 canvasId: 'canvasdrawer',
                 success: (result) => {
-                  this.props.onCreateSuccess(result.tempFilePath);
+                  onCreateSuccess && onCreateSuccess(result.tempFilePath);
                 },
                 fail: (err) => {
-                  this.props.onCreateFail(err);
+                  onCreateFail && onCreateFail(err);
                 },
               }, this.$scope);
             }, time);
@@ -639,6 +641,7 @@ export default class CanvasDrawer extends Component {
         })
       .catch((err) => {
         Taro.showToast({ icon: 'none', title: err.errMsg || '生成失败' });
+        onCreateFail && onCreateFail(err);
         console.error(err);
       });
   }
