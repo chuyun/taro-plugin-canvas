@@ -161,6 +161,8 @@ import TaroCanvasDrawer from '../../component/taro-plugin-canvas';
 
 ### success
 
+成功回调 onCreateSuccess  
+
 返回生成海报图片的本地url，一般做法是使用wx.previewImage预览海报或者在指定位置预览，如下
 
 ```javascript
@@ -204,9 +206,6 @@ import TaroCanvasDrawer from '../../component/taro-plugin-canvas';
     console.log(error);
   }
 ```
-
-返回错误信息
-
 
 ### Demo 
 
