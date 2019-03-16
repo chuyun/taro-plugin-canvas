@@ -139,20 +139,28 @@ export default class CanvasDrawer extends Component {
     const textArr = [];
     if (textWidth > width) {
       // 文本宽度 大于 渲染宽度
-      const unitTextWidth = +(textWidth / text.length).toFixed(2);
-      const unitLineNum = parseInt(width / unitTextWidth);  // 一行文本数量
-      for (let i = 0; i <= text.length; i += unitLineNum) {  // 将文字转为数组，一行文字一个元素
-        const resText = text.slice(i, i + unitLineNum);
-        resText !== '' && textArr.push(resText);
-        if (textArr.length === lineNum) {
-          break;
+      let fillText = '';
+      let line = 1;
+      for (let i = 0; i <= text.length - 1 ; i++) {  // 将文字转为数组，一行文字一个元素
+        fillText = fillText + text[i];
+        if (this.toRpx(this.ctx.measureText(fillText).width) >= width) {
+          if (line === lineNum) {
+            if (i !== text.length - 1) {
+              fillText = fillText.substring(0, fillText.length - 1) + '...';
+            }
+          }
+          if(line <= lineNum) {
+            textArr.push(fillText);
+          }
+          fillText = '';
+          line++;
+        } else {
+          if(line <= lineNum) {
+            if(i === text.length -1){
+               textArr.push(fillText);
+            }
+          }
         }
-      }
-      if (textArr.length * unitLineNum < text.length) {
-        const moreTextWidth = this.ctx.measureText('...').width;
-        const moreTextNum = Math.ceil(moreTextWidth / unitTextWidth);
-        const reg = new RegExp(`.{${moreTextNum}}$`);
-        textArr[textArr.length - 1] = textArr[textArr.length - 1].replace(reg, '...');
       }
       textWidth = width;
     } else {

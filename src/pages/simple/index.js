@@ -52,7 +52,7 @@ export default class Simple extends Component {
           {
             x: 80,
             y: 420,
-            text: '国产谍战 真人演出,《隐形守护者》凭什么成为Steam第一?',
+            text: '国产谍战、真人演出,《隐形守护者》凭什么成为Steam第一?',
             fontSize: 32,
             color: '#000',
             opacity: 1,
