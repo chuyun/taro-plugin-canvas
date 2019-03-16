@@ -1,6 +1,9 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Button, Image } from '@tarojs/components'
-import TaroCanvasDrawer from '../../component/taro-plugin-canvas';
+
+import TaroCanvasDrawer from '../../component/taro-plugin-canvas'; // 拷贝文件到component的引入方式
+
+// import { TaroCanvasDrawer  } from 'taro-plugin-canvas'; // npm 引入方式
 
 import './index.scss'
 
@@ -499,10 +502,9 @@ export default class Index extends Component {
 
   componentDidHide() { }
 
-  saveSharCardFuc = (config = this.state.rssConfig) => {
+  canvasDrawFunc = (config = this.state.rssConfig) => {
     this.setState({
       canvasStatus: true,
-      // painting:
       config: config,
     })
     Taro.showLoading({
@@ -510,31 +512,37 @@ export default class Index extends Component {
     })
   }
 
-  onGetImage(event) {
-    console.log("event");
-    console.log(event);
-    const { tempFilePath, errMsg } = event;
-    if (errMsg === 'canvasdrawer:ok') {
-      Taro.hideLoading();
-      this.setState({
-        shareImage: tempFilePath,
-      })
-    };
-  }
-
-  onCreateSuccess = (e) => {
+  onCreateSuccess = (result) => {
+    const { tempFilePath, errMsg } = result;
     Taro.hideLoading();
     console.log('onCreateSuccess')
-    this.setState({
-      shareImage: e,
-    })
-    Taro.previewImage({
-      current: e,
-      urls: [e]
-    })
+    if (errMsg === 'canvasToTempFilePath:ok') {
+      this.setState({
+        shareImage: tempFilePath,
+        canvasStatus: false,
+        config:null
+      })
+    } else {
+      this.setState({
+        canvasStatus: false,
+        config:null
+      })
+       Taro.showToast({ icon: 'none', title: errMsg || '出现错误' });
+       console.log(errMsg);
+    }
+    // 预览
+    // Taro.previewImage({
+    //   current: tempFilePath,
+    //   urls: [tempFilePath]
+    // })
   }
 
   onCreateFail = (error) => {
+    Taro.hideLoading();
+    this.setState({
+      canvasStatus: false,
+      config:null
+    })
     console.log('onCreateFail')
     console.log(error);
   }
@@ -561,9 +569,29 @@ export default class Index extends Component {
     })
   }
 
+  toSimplePage = () => {
+    Taro.navigateTo({
+      url: '/pages/simple/index'
+    })
+  }
+
   render() {
     return (
       <View className='index'>
+        <View>
+          <View className='flex-row'>
+            <Button onClick={this.canvasDrawFunc.bind(this, this.state.rssConfig)} >绘制1</Button>
+            <Button onClick={this.canvasDrawFunc.bind(this, this.state.jdConfig)} >绘制2</Button>
+            <Button onClick={this.canvasDrawFunc.bind(this, this.state.demoConfig)} >绘制3</Button>
+            <Button onClick={this.canvasDrawFunc.bind(this, this.state.wxConfig)} >绘制4</Button>
+          </View>
+          <View className='flex-row'>
+            <Button onClick={this.saveToAlbum}>保存到相册</Button>
+            <Button onClick={this.reset}>重置</Button>
+            <Button onClick={this.toSimplePage}>简易版Demo</Button>
+          </View>
+        </View>
+
         <View className='shareImage-cont'>
           <Image
             className='shareImage'
@@ -581,19 +609,7 @@ export default class Index extends Component {
             )
           }
         </View>
-        <View>
-          <View className='flex-row'>
-            <Button onClick={this.saveSharCardFuc.bind(this, this.state.rssConfig)} disabled={this.state.shareImage}>绘制1</Button>
-            <Button onClick={this.saveSharCardFuc.bind(this, this.state.jdConfig)} disabled={this.state.shareImage}>绘制2</Button>
-            <Button onClick={this.saveSharCardFuc.bind(this, this.state.demoConfig)} disabled={this.state.shareImage}>绘制3</Button>
-            <Button onClick={this.saveSharCardFuc.bind(this, this.state.wxConfig)} disabled={this.state.shareImage}>绘制4</Button>
-          </View>
-          <View className='flex-row'>
-            <Button onClick={this.saveToAlbum}>保存到相册</Button>
-            <Button onClick={this.reset}>重置</Button>
-          </View>
-        </View>
-      </View>
+       </View>
     )
   }
 }

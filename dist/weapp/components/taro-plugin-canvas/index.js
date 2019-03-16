@@ -7,8 +7,8 @@ export default class CanvasDrawer extends Component {
   static defaultProps = {};
   static propTypes = {
     config: PropTypes.object.isRequired,
-    onCreateSuccess: PropTypes.func,
-    onCreateFail: PropTypes.func,
+    onCreateSuccess: PropTypes.func.isRequired,
+    onCreateFail: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -39,7 +39,7 @@ export default class CanvasDrawer extends Component {
     this.onCreate();
   }
 
-  componentWillUnmount() {}
+  componentWillUnmount() { }
 
   /**
    * @param  {} rpx
@@ -555,6 +555,7 @@ export default class CanvasDrawer extends Component {
    * @param  { boolean } reset=false
    */
   onCreate = (reset = false) => {
+    const { onCreateFail } = this.props;
     !this.state.hideLoading && Taro.showLoading({ mask: true, title: '生成中...' });
     return this.downloadResourceTransit(typeof reset === 'boolean' && reset).then(() => {
       !this.state.hideLoading && Taro.hideLoading();
@@ -564,7 +565,10 @@ export default class CanvasDrawer extends Component {
         !this.state.hideLoading && Taro.hideLoading();
         Taro.showToast({ icon: 'none', title: err.errMsg || '生成失败' });
         console.error(err);
-        this.props.onCreateFail(err);
+        if (!onCreateFail) {
+          console.warn('您必须实现 taro-plugin-canvas 组件的 onCreateFail 方法，详见文档 https://github.com/chuyun/taro-plugin-canvas#fail');
+        }
+        onCreateFail && onCreateFail(err);
       })
   }
 
@@ -572,71 +576,78 @@ export default class CanvasDrawer extends Component {
    * @param  { object } config
    */
   create = (config) => {
+    const { onCreateSuccess, onCreateFail } = this.props;
     this.ctx = Taro.createCanvasContext('canvasdrawer', this.$scope);
     const height = this.getHeight(config);
 
     this.initCanvas(config.width, height, config.debug)
       .then(() => {
-          // 设置画布底色
-          if (config.backgroundColor) {
-            this.ctx.save();
-            this.ctx.setFillStyle(config.backgroundColor);
-            this.ctx.fillRect(0, 0, this.toPx(config.width), this.toPx(height));
-            this.ctx.restore();
-          }
-          const { texts = [], images = [], blocks = [], lines = [] } = config;
-          const queue = this.drawArr
-            .concat(texts.map((item) => {
-              item.type = 'text';
-              item.zIndex = item.zIndex || 0;
-              return item;
-            }))
-            .concat(blocks.map((item) => {
-              item.type = 'block';
-              item.zIndex = item.zIndex || 0;
-              return item;
-            }))
-            .concat(lines.map((item) => {
-              item.type = 'line';
-              item.zIndex = item.zIndex || 0;
-              return item;
-            }));
-          // 按照顺序排序
-          queue.sort((a, b) => a.zIndex - b.zIndex);
+        // 设置画布底色
+        if (config.backgroundColor) {
+          this.ctx.save();
+          this.ctx.setFillStyle(config.backgroundColor);
+          this.ctx.fillRect(0, 0, this.toPx(config.width), this.toPx(height));
+          this.ctx.restore();
+        }
+        const { texts = [], images = [], blocks = [], lines = [] } = config;
+        const queue = this.drawArr
+          .concat(texts.map((item) => {
+            item.type = 'text';
+            item.zIndex = item.zIndex || 0;
+            return item;
+          }))
+          .concat(blocks.map((item) => {
+            item.type = 'block';
+            item.zIndex = item.zIndex || 0;
+            return item;
+          }))
+          .concat(lines.map((item) => {
+            item.type = 'line';
+            item.zIndex = item.zIndex || 0;
+            return item;
+          }));
+        // 按照顺序排序
+        queue.sort((a, b) => a.zIndex - b.zIndex);
 
-          queue.forEach((item) => {
-            if (item.type === 'image') {
-              this.drawImage(item)
-            } else if (item.type === 'text') {
-              this.drawText(item)
-            } else if (item.type === 'block') {
-              this.drawBlock(item)
-            } else if (item.type === 'line') {
-              this.drawLine(item)
-            }
-          });
-
-          const res = Taro.getSystemInfoSync();
-          const platform = res.platform;
-          let time = 0;
-          if (platform === 'android') {
-            // 在安卓平台，经测试发现如果海报过于复杂在转换时需要做延时，要不然样式会错乱
-            time = 300;
+        queue.forEach((item) => {
+          if (item.type === 'image') {
+            this.drawImage(item)
+          } else if (item.type === 'text') {
+            this.drawText(item)
+          } else if (item.type === 'block') {
+            this.drawBlock(item)
+          } else if (item.type === 'line') {
+            this.drawLine(item)
           }
-          this.ctx.draw(false, () => {
-            setTimeout(() => {
-              Taro.canvasToTempFilePath({
-                canvasId: 'canvasdrawer',
-                success: (result) => {
-                  this.props.onCreateSuccess(result.tempFilePath);
-                },
-                fail: (err) => {
-                  this.props.onCreateFail(err);
-                },
-              }, this.$scope);
-            }, time);
-          });
-        })
+        });
+
+        const res = Taro.getSystemInfoSync();
+        const platform = res.platform;
+        let time = 0;
+        if (platform === 'android') {
+          // 在安卓平台，经测试发现如果海报过于复杂在转换时需要做延时，要不然样式会错乱
+          time = 300;
+        }
+        this.ctx.draw(false, () => {
+          setTimeout(() => {
+            Taro.canvasToTempFilePath({
+              canvasId: 'canvasdrawer',
+              success: (result) => {
+                if (!onCreateSuccess) {
+                  console.warn('您必须实现 taro-plugin-canvas 组件的 onCreateSuccess 方法，详见文档 https://github.com/chuyun/taro-plugin-canvas#success');
+                }
+                onCreateSuccess && onCreateSuccess(result);
+              },
+              fail: (err) => {
+                if (!onCreateFail) {
+                  console.warn('您必须实现 taro-plugin-canvas 组件的 onCreateFail 方法，详见文档 https://github.com/chuyun/taro-plugin-canvas#fail');
+                }
+                onCreateFail && onCreateFail(err);
+              },
+            }, this.$scope);
+          }, time);
+        });
+      })
       .catch((err) => {
         Taro.showToast({ icon: 'none', title: err.errMsg || '生成失败' });
         console.error(err);
@@ -653,6 +664,5 @@ export default class CanvasDrawer extends Component {
       </Canvas >
     )
   }
-
 }
 

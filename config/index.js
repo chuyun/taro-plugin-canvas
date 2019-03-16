@@ -8,7 +8,7 @@ const config = {
     '828': 1.81 / 2
   },
   sourceRoot: 'src',
-  outputRoot: 'miniprogram_dist',
+  outputRoot: 'build/weapp',
   plugins: {
     babel: {
       sourceMap: true,
