@@ -2,7 +2,12 @@ import Taro, { Component } from '@tarojs/taro';
 import PropTypes from 'prop-types';
 import { Canvas } from '@tarojs/components';
 import { randomString, getHeight, downloadImageAndInfo } from './utils/tools';
-import { _drawRadiusRect, _getTextWidth } from './utils/draw';
+import {
+  drawImage,
+  drawText,
+  drawBlock,
+  drawLine,
+} from './utils/draw';
 import './index.css';
 
 let count = 1;
@@ -70,291 +75,6 @@ export default class CanvasDrawer extends Component {
       return parseInt(px / factor);
     }
     return px / factor;
-  }
-  /**
-   * @description 绘制圆角矩形
-   * @param { number } x - 左上角x坐标
-   * @param { number } y - 左上角y坐标
-   * @param { number } w - 矩形的宽
-   * @param { number } h - 矩形的高
-   * @param { number } r - 圆角半径
-   */
-  // _drawRadiusRect = (x, y, w, h, r ) => {
-  //   // const { x, y, w, h, r } = drawData;
-  //   const br = r / 2;
-  //   this.ctx.beginPath();
-  //   this.ctx.moveTo(this.toPx(x + br), this.toPx(y));    // 移动到左上角的点
-  //   this.ctx.lineTo(this.toPx(x + w - br), this.toPx(y));
-  //   this.ctx.arc(this.toPx(x + w - br), this.toPx(y + br), this.toPx(br), 2 * Math.PI * (3 / 4), 2 * Math.PI * (4 / 4))
-  //   this.ctx.lineTo(this.toPx(x + w), this.toPx(y + h - br));
-  //   this.ctx.arc(this.toPx(x + w - br), this.toPx(y + h - br), this.toPx(br), 0, 2 * Math.PI * (1 / 4))
-  //   this.ctx.lineTo(this.toPx(x + br), this.toPx(y + h));
-  //   this.ctx.arc(this.toPx(x + br), this.toPx(y + h - br), this.toPx(br), 2 * Math.PI * (1 / 4), 2 * Math.PI * (2 / 4))
-  //   this.ctx.lineTo(this.toPx(x), this.toPx(y + br));
-  //   this.ctx.arc(this.toPx(x + br), this.toPx(y + br), this.toPx(br), 2 * Math.PI * (2 / 4), 2 * Math.PI * (3 / 4))
-  // }
-  /**
-   * @description 计算文本长度
-   * @param {Array|Object}} text 数组 或者 对象
-   */
-  // _getTextWidth = (text) => {
-  //   let texts = [];
-  //   if (Object.prototype.toString.call(text) === '[object Object]') {
-  //     texts.push(text);
-  //   } else {
-  //     texts = text;
-  //   }
-  //   let width = 0;
-  //   texts.forEach(({ fontSize, text, marginLeft = 0, marginRight = 0 }) => {
-  //     this.ctx.setFontSize(this.toPx(fontSize));
-  //     width += this.ctx.measureText(text).width + marginLeft + marginRight;
-  //   })
-
-  //   return this.toRpx(width);
-  // }
-
-
-  /**
-   * @description 渲染一段文字
-   * @param  {} {x
-   * @param  {} y
-   * @param  {} fontSize
-   * @param  {} color
-   * @param  {} baseLine
-   * @param  {} textAlign='left'
-   * @param  {} text
-   * @param  {} opacity=1
-   * @param  {} textDecoration='none'
-   * @param  {} width
-   * @param  {} lineNum=1
-   * @param  {} lineHeight=0
-   * @param  {} fontWeight='normal'
-   * @param  {} fontStyle='normal'
-   * @param  {} fontFamily="sans-serif"}
-   */
-  _drawSingleText = ({ x, y, fontSize, color, baseLine, textAlign = 'left', text, opacity = 1, textDecoration = 'none',
-    width, lineNum = 1, lineHeight = 0, fontWeight = 'normal', fontStyle = 'normal', fontFamily = "sans-serif" }) => {
-    this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.font = fontStyle + " " + fontWeight + " " + this.toPx(fontSize, true) + "px " + fontFamily
-    this.ctx.setGlobalAlpha(opacity);
-    // this.ctx.setFontSize(this.toPx(fontSize));
-    this.ctx.setFillStyle(color);
-    this.ctx.setTextBaseline(baseLine);
-    this.ctx.setTextAlign(textAlign);
-    let textWidth = this.toRpx(this.ctx.measureText(text).width);
-    const textArr = [];
-    if (textWidth > width) {
-      // 文本宽度 大于 渲染宽度
-      let fillText = '';
-      let line = 1;
-      for (let i = 0; i <= text.length - 1; i++) {  // 将文字转为数组，一行文字一个元素
-        fillText = fillText + text[i];
-        if (this.toRpx(this.ctx.measureText(fillText).width) >= width) {
-          if (line === lineNum) {
-            if (i !== text.length - 1) {
-              fillText = fillText.substring(0, fillText.length - 1) + '...';
-            }
-          }
-          if (line <= lineNum) {
-            textArr.push(fillText);
-          }
-          fillText = '';
-          line++;
-        } else {
-          if (line <= lineNum) {
-            if (i === text.length - 1) {
-              textArr.push(fillText);
-            }
-          }
-        }
-      }
-      textWidth = width;
-    } else {
-      textArr.push(text);
-    }
-
-    textArr.forEach((item, index) => {
-      this.ctx.fillText(item, this.toPx(x), this.toPx(y + (lineHeight || fontSize) * index));
-    })
-
-    this.ctx.restore();
-
-    // textDecoration
-    if (textDecoration !== 'none') {
-      let lineY = y;
-      if (textDecoration === 'line-through') {
-        // 目前只支持贯穿线
-        lineY = y;
-      }
-      this.ctx.save();
-      this.ctx.moveTo(this.toPx(x), this.toPx(lineY));
-      this.ctx.lineTo(this.toPx(x) + this.toPx(textWidth), this.toPx(lineY));
-      this.ctx.setStrokeStyle(color);
-      this.ctx.stroke();
-      this.ctx.restore();
-    }
-
-    return textWidth;
-  }
-
-  /**
-   * @description 渲染块
-   * @param  {} {text
-   * @param  {} width=0
-   * @param  {} height
-   * @param  {} x
-   * @param  {} y
-   * @param  {} paddingLeft=0
-   * @param  {} paddingRight=0
-   * @param  {} borderWidth
-   * @param  {} backgroundColor
-   * @param  {} borderColor
-   * @param  {} borderRadius=0
-   * @param  {} opacity=1}
-   */
-  drawBlock = ({ text, width = 0, height, x, y, paddingLeft = 0, paddingRight = 0, borderWidth, backgroundColor, borderColor, borderRadius = 0, opacity = 1 }) => {
-    // 判断是否块内有文字
-    let blockWidth = 0; // 块的宽度
-    let textX = 0;
-    let textY = 0;
-    if (typeof text !== 'undefined') {
-      // 如果有文字并且块的宽度小于文字宽度，块的宽度为 文字的宽度 + 内边距
-      const textWidth = _getTextWidth(typeof text.text === 'string' ? text : text.text,this.ctx, this.toPx, this.toRpx);
-      blockWidth = textWidth > width ? textWidth : width;
-      blockWidth += paddingLeft + paddingLeft;
-
-      const { textAlign = 'left', text: textCon } = text;
-      textY = height / 2 + y; // 文字的y轴坐标在块中线
-      if (textAlign === 'left') {
-        // 如果是右对齐，那x轴在块的最左边
-        textX = x + paddingLeft;
-      } else if (textAlign === 'center') {
-        textX = blockWidth / 2 + x;
-      } else {
-        textX = x + blockWidth - paddingRight;
-      }
-    } else {
-      blockWidth = width;
-    }
-
-    if (backgroundColor) {
-      // 画面
-      this.ctx.save();
-      this.ctx.setGlobalAlpha(opacity);
-      this.ctx.setFillStyle(backgroundColor);
-      if (borderRadius > 0) {
-        // 画圆角矩形
-        let drawData ={
-          x, y, w:blockWidth, h:height, r:borderRadius
-        };
-        _drawRadiusRect(drawData,this.ctx,this.toPx);
-        this.ctx.fill();
-      } else {
-        this.ctx.fillRect(this.toPx(x), this.toPx(y), this.toPx(blockWidth), this.toPx(height));
-      }
-      this.ctx.restore();
-    }
-    if (borderWidth) {
-      // 画线
-      this.ctx.save();
-      this.ctx.setGlobalAlpha(opacity);
-      this.ctx.setStrokeStyle(borderColor);
-      this.ctx.setLineWidth(this.toPx(borderWidth));
-      if (borderRadius > 0) {
-        // 画圆角矩形边框
-        let drawData = {
-          x, y, w:blockWidth, h:height, r:borderRadius,
-        }
-        _drawRadiusRect(drawData,this.ctx,this.toPx);
-        this.ctx.stroke();
-      } else {
-        this.ctx.strokeRect(this.toPx(x), this.toPx(y), this.toPx(blockWidth), this.toPx(height));
-      }
-      this.ctx.restore();
-    }
-
-    if (text) {
-      this.drawText(Object.assign(text, { x: textX, y: textY }))
-    }
-  }
-
-  /**
-   * 渲染文字
-   * @param {Object} params
-   */
-  /**
-   * @param  {} params
-   * @param  {} params.y
-   * @param  {} params.fontSize
-   * @param  {} params.color
-   * @param  {} params.baseLine
-   * @param  {} params.textAlign
-   * @param  {} params.text
-   * @param  {} params.opacity=1
-   * @param  {} params.width
-   * @param  {} params.lineNum
-   */
-  drawText = (params) => {
-    const { x, y, fontSize, color, baseLine, textAlign, text, opacity = 1, width, lineNum, lineHeight } = params;
-    if (Object.prototype.toString.call(text) === '[object Array]') {
-      let preText = { x, y, baseLine };
-      text.forEach(item => {
-        preText.x += item.marginLeft || 0;
-        const textWidth = this._drawSingleText(Object.assign(item, {
-          ...preText,
-        }));
-        preText.x += textWidth + (item.marginRight || 0); // 下一段字的x轴为上一段字x + 上一段字宽度
-      })
-    } else {
-      this._drawSingleText(params);
-    }
-  }
-
-  /**
-   * 渲染图片
-   */
-  drawImage = (data) => {
-    const { imgPath, x, y, w, h, sx, sy, sw, sh, borderRadius = 0, borderWidth = 0, borderColor } = data;
-    this.ctx.save();
-    if (borderRadius > 0) {
-      let drawData = {
-        x, y, w, h,
-        r: borderRadius
-      };
-      _drawRadiusRect(drawData,this.ctx,this.toPx);
-      this.ctx.clip();
-      this.ctx.drawImage(imgPath, this.toPx(sx), this.toPx(sy), this.toPx(sw), this.toPx(sh), this.toPx(x), this.toPx(y), this.toPx(w), this.toPx(h));
-      if (borderWidth > 0) {
-        this.ctx.setStrokeStyle(borderColor);
-        this.ctx.setLineWidth(this.toPx(borderWidth));
-        this.ctx.stroke();
-      }
-    } else {
-      this.ctx.drawImage(imgPath, this.toPx(sx), this.toPx(sy), this.toPx(sw), this.toPx(sh), this.toPx(x), this.toPx(y), this.toPx(w), this.toPx(h));
-    }
-    this.ctx.restore();
-  }
-
-  /**
-   * @description 渲染线
-   * @param  {} {startX
-   * @param  {} startY
-   * @param  {} endX
-   * @param  {} endY
-   * @param  {} color
-   * @param  {} width}
-   */
-  drawLine = ({ startX, startY, endX, endY, color, width }) => {
-    this.ctx.save();
-    this.ctx.beginPath();
-    this.ctx.setStrokeStyle(color);
-    this.ctx.setLineWidth(this.toPx(width));
-    this.ctx.moveTo(this.toPx(startX), this.toPx(startY));
-    this.ctx.lineTo(this.toPx(endX), this.toPx(endY));
-    this.ctx.stroke();
-    this.ctx.closePath();
-    this.ctx.restore();
   }
 
   /**
@@ -462,7 +182,12 @@ export default class CanvasDrawer extends Component {
           this.ctx.fillRect(0, 0, this.toPx(config.width), this.toPx(height));
           this.ctx.restore();
         }
-        const { texts = [], images = [], blocks = [], lines = [] } = config;
+        const {
+          texts = [],
+          // images = [],
+          blocks = [],
+          lines = [],
+        } = config;
         const queue = this.drawArr
           .concat(texts.map((item) => {
             item.type = 'text';
@@ -483,14 +208,19 @@ export default class CanvasDrawer extends Component {
         queue.sort((a, b) => a.zIndex - b.zIndex);
 
         queue.forEach((item) => {
+          let drawOptions = {
+            ctx: this.ctx,
+            toPx: this.toPx,
+            toRpx: this.toRpx,
+          }
           if (item.type === 'image') {
-            this.drawImage(item)
+            drawImage(item,drawOptions)
           } else if (item.type === 'text') {
-            this.drawText(item)
+            drawText(item,drawOptions)
           } else if (item.type === 'block') {
-            this.drawBlock(item)
+            drawBlock(item,drawOptions)
           } else if (item.type === 'line') {
-            this.drawLine(item)
+            drawLine(item,drawOptions)
           }
         });
 
