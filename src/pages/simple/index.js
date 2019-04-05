@@ -91,28 +91,28 @@ export default class Simple extends Component {
           }
         ],
         images: [
-          {
-            url: 'http://pic.juncao.cc/rssfeed/images/demo.png',
-            width: 670,
-            height: 320,
-            y: 40,
-            x: 40,
-            borderRadius: 12,
-            zIndex: 10,
-            // borderRadius: 150,
-            // borderWidth: 10,
-            // borderColor: 'red',
-          },
-          {
-            url: 'https://pic.juncao.cc/cms/images/minapp.jpg',
-            width: 110,
-            height: 110,
-            y: 570,
-            x: 560,
-            borderRadius: 100,
-            borderWidth: 0,
-            zIndex: 10,
-          },
+          // {
+          //   url: 'http://pic.juncao.cc/rssfeed/images/demo.png',
+          //   width: 670,
+          //   height: 320,
+          //   y: 40,
+          //   x: 40,
+          //   borderRadius: 12,
+          //   zIndex: 10,
+          //   // borderRadius: 150,
+          //   // borderWidth: 10,
+          //   // borderColor: 'red',
+          // },
+          // {
+          //   url: 'https://pic.juncao.cc/cms/images/minapp.jpg',
+          //   width: 110,
+          //   height: 110,
+          //   y: 570,
+          //   x: 560,
+          //   borderRadius: 100,
+          //   borderWidth: 0,
+          //   zIndex: 10,
+          // },
         ],
         lines: [
           {
@@ -160,10 +160,10 @@ export default class Simple extends Component {
       console.log(errMsg);
     }
     // 预览
-    // Taro.previewImage({
-    //   current: tempFilePath,
-    //   urls: [tempFilePath]
-    // })
+    Taro.previewImage({
+      current: tempFilePath,
+      urls: [tempFilePath]
+    })
   }
 
   // 绘制失败回调函数 （必须实现）=> 接收绘制错误信息、重置 TaroCanvasDrawer 状态

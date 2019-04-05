@@ -391,17 +391,18 @@ export default class Index extends Component {
         ]
 
       },
+
       wxConfig: {
-        width: 750,
-        height: 1624,
+        width: 200,
+        height: 200,
         backgroundColor: '#F2F3F2',
         debug: false,
         blocks: [
           {
             x: 20,
             y: 80,
-            width: 710,
-            height: 1520,
+            width: 100,
+            height: 100,
             paddingLeft: 0,
             paddingRight: 0,
             borderWidth: 2,
@@ -411,9 +412,9 @@ export default class Index extends Component {
           },
           {
             x: 20,
-            y: 800,
-            width: 710,
-            height: 804,
+            y: 100,
+            width: 100,
+            height: 100,
             paddingLeft: 0,
             paddingRight: 0,
             backgroundColor: '#fff',
@@ -421,8 +422,8 @@ export default class Index extends Component {
           },
           {
             x: 20,
-            y: 800,
-            width: 710,
+            y: 100,
+            width: 10,
             height: 20,
             paddingLeft: 0,
             paddingRight: 0,
@@ -432,8 +433,8 @@ export default class Index extends Component {
         ],
         texts: [
           {
-            x: 380,
-            y: 660,
+            x: 100,
+            y: 60,
             text: '京门风月',
             fontSize: 48,
             fontFamily: 'STSong',
@@ -443,12 +444,12 @@ export default class Index extends Component {
             lineHeight: 48,
             lineNum: 2,
             textAlign: 'center',
-            width: 200,
-            zIndex: 999,
+            width: 100,
+            zIndex: 99,
           },
           {
-            x: 380,
-            y: 720,
+            x: 80,
+            y: 20,
             text: '测试赛',
             fontFamily: 'STSong',
             fontSize: 32,
@@ -463,26 +464,26 @@ export default class Index extends Component {
           },
         ],
         images: [
-          {
-            url: 'https://pic.juncao.cc/temp/IMG_1294.JPG',
-            width: 290,
-            height: 420,
-            y: 170,
-            x: 230,
-            borderRadius: 12,
-            zIndex: 10,
-            // borderRadius: 150,
-            // borderWidth: 10,
-            // borderColor: 'red',
-          },
+          // {
+          //   url: 'https://pic.juncao.cc/temp/IMG_1294.JPG',
+          //   width: 290,
+          //   height: 420,
+          //   y: 170,
+          //   x: 230,
+          //   borderRadius: 12,
+          //   zIndex: 10,
+          //   // borderRadius: 150,
+          //   // borderWidth: 10,
+          //   // borderColor: 'red',
+          // },
 
         ],
         lines: [
           {
-            startY: 540,
+            startY: 40,
             startX: 80,
-            endX: 670,
-            endY: 541,
+            endX: 70,
+            endY: 40,
             width: 1,
             color: '#eee',
           }
