@@ -228,6 +228,8 @@ export function drawImage(data, drawOptions) {
       r: borderRadius
     };
     _drawRadiusRect(drawData, drawOptions);
+    ctx.strokeStyle = 'rgba(255,255,255,0)';
+    ctx.stroke();
     ctx.clip();
     ctx.drawImage(imgPath, toPx(sx), toPx(sy), toPx(sw), toPx(sh), toPx(x), toPx(y), toPx(w), toPx(h));
     if (borderWidth > 0) {
