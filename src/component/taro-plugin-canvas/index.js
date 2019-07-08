@@ -85,16 +85,16 @@ export default class CanvasDrawer extends Component {
   _downloadImageAndInfo = (image, index) => {
     return new Promise((resolve, reject) => {
       downloadImageAndInfo(image, index, this.toRpx)
-      .then(
-        (result) => {
-          this.drawArr.push(result);
-          resolve();
-        }
-      )
-      .catch(err => {
-        console.log(err);
-        reject(err)
-      });
+        .then(
+          (result) => {
+            this.drawArr.push(result);
+            resolve();
+          }
+        )
+        .catch(err => {
+          console.log(err);
+          reject(err)
+        });
     })
   }
   /**
@@ -125,7 +125,7 @@ export default class CanvasDrawer extends Component {
             reject(e)
           });
       } else {
-        setTimeout(()=>{
+        setTimeout(() => {
           resolve(1);
         }, 500)
       }
@@ -152,7 +152,7 @@ export default class CanvasDrawer extends Component {
   onCreate = () => {
     const { onCreateFail, config } = this.props;
     Taro.showLoading({ mask: true, title: '生成中...' });
-      return this.downloadResourceTransit()
+    return this.downloadResourceTransit()
       .then(() => {
         this.create(config);
       })
@@ -214,13 +214,13 @@ export default class CanvasDrawer extends Component {
             toRpx: this.toRpx,
           }
           if (item.type === 'image') {
-            drawImage(item,drawOptions)
+            drawImage(item, drawOptions)
           } else if (item.type === 'text') {
-            drawText(item,drawOptions)
+            drawText(item, drawOptions)
           } else if (item.type === 'block') {
-            drawBlock(item,drawOptions)
+            drawBlock(item, drawOptions)
           } else if (item.type === 'line') {
-            drawLine(item,drawOptions)
+            drawLine(item, drawOptions)
           }
         });
 
@@ -273,7 +273,7 @@ export default class CanvasDrawer extends Component {
 
   render() {
     const { pxWidth, pxHeight, debug } = this.state;
-    if(pxWidth && pxHeight){
+    if (pxWidth && pxHeight) {
       return (
         <Canvas
           canvas-id={this.canvasId}
