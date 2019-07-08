@@ -1,9 +1,6 @@
 # taro-plugin-canvas
 小程序组件-小程序海报组件
-   <a href="https://www.npmjs.com/package/taro-plugin-canvas">
-   <img src="https://img.shields.io/npm/v/taro-plugin-canvas.svg?style=flat" alt="npm"></a>
-   <a href="https://www.npmjs.com/package/taro-plugin-canvas">
-   <img src="https://img.shields.io/npm/dm/taro-plugin-canvas.svg?style=flat" alt="npm"></a>
+   [![npm](https://img.shields.io/npm/v/taro-plugin-canvas.svg?style=flat "npm")](https://www.npmjs.com/package/taro-plugin-canvas)[![npm](https://img.shields.io/npm/dm/taro-plugin-canvas.svg?style=flat "npm")](https://www.npmjs.com/package/taro-plugin-canvas)
 
 ## 概述
 taro-plugin-canvas 是基于 Taro 框架的微信小程序 canvas 绘图组件，封装了常用的操作，通过配置的方式生成分享图片
