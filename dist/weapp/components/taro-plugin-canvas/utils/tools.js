@@ -146,7 +146,7 @@ export function getImageInfo(imgPath, index) {
 * @param  {} index
 * @returns  { Promise }
 */
-export function downloadImageAndInfo(image, index, toRpxFunc) {
+export function downloadImageAndInfo(image, index, toRpxFunc, pixelRatio) {
   return new Promise((resolve, reject) => {
     const { x, y, url, zIndex } = image;
     const imageUrl = url;
@@ -161,8 +161,8 @@ export function downloadImageAndInfo(image, index, toRpxFunc) {
         const borderRadius = image.borderRadius || 0;
         const setWidth = image.width;
         const setHeight = image.height;
-        const width = toRpxFunc(imgInfo.width);
-        const height = toRpxFunc(imgInfo.height);
+        const width = toRpxFunc(imgInfo.width / pixelRatio);
+        const height = toRpxFunc(imgInfo.height / pixelRatio);
 
         if (width / height <= setWidth / setHeight) {
           sx = 0;

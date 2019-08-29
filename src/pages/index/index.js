@@ -23,6 +23,7 @@ export default class Index extends Component {
         height: 1334,
         backgroundColor: '#fff',
         debug: false,
+        pixelRatio: 1,
         blocks: [
           {
             width: 690,
@@ -145,28 +146,28 @@ export default class Index extends Component {
             x: 30,
             y: 30,
             borderRadius: 62,
-            url: 'https://lc-I0j7ktVK.cn-n1.lcfile.com/02bb99132352b5b5dcea.jpg',
+            url: 'https://s.newscdn.cn/file/2019/05/f82a7217-f0e9-46d5-9869-92d62b5d3a19.png',
           },
           {
             width: 634,
             height: 634,
             x: 59,
             y: 210,
-            url: 'https://lc-I0j7ktVK.cn-n1.lcfile.com/193256f45999757701f2.jpeg',
+            url: 'https://s.newscdn.cn/file/2019/05/f82a7217-f0e9-46d5-9869-92d62b5d3a19.png',
           },
           {
             width: 220,
             height: 220,
             x: 92,
             y: 1020,
-            url: 'https://lc-I0j7ktVK.cn-n1.lcfile.com/d719fdb289c955627735.jpg',
+            url: 'https://s.newscdn.cn/file/2019/05/f82a7217-f0e9-46d5-9869-92d62b5d3a19.png',
           },
           {
             width: 750,
             height: 90,
             x: 0,
             y: 1244,
-            url: 'https://lc-I0j7ktVK.cn-n1.lcfile.com/67b0a8ad316b44841c69.png',
+            url: 'https://s.newscdn.cn/file/2019/05/f82a7217-f0e9-46d5-9869-92d62b5d3a19.png',
           }
         ]
 
@@ -176,6 +177,7 @@ export default class Index extends Component {
         height: 1000,
         backgroundColor: '#fff',
         debug: false,
+        pixelRatio: 1,
         blocks: [
           {
             x: 0,
@@ -287,6 +289,7 @@ export default class Index extends Component {
         height: 750,
         backgroundColor: '#fff',
         debug: false,
+        pixelRatio: 1,
         blocks: [
           {
             x: 0,
@@ -397,6 +400,7 @@ export default class Index extends Component {
         height: 200,
         backgroundColor: '#F2F3F2',
         debug: false,
+        pixelRatio: 1,
         blocks: [
           {
             x: 20,
@@ -521,15 +525,15 @@ export default class Index extends Component {
       this.setState({
         shareImage: tempFilePath,
         canvasStatus: false,
-        config:null
+        config: null
       })
     } else {
       this.setState({
         canvasStatus: false,
-        config:null
+        config: null
       })
-       Taro.showToast({ icon: 'none', title: errMsg || '出现错误' });
-       console.log(errMsg);
+      Taro.showToast({ icon: 'none', title: errMsg || '出现错误' });
+      console.log(errMsg);
     }
     // 预览
     // Taro.previewImage({
@@ -542,7 +546,7 @@ export default class Index extends Component {
     Taro.hideLoading();
     this.setState({
       canvasStatus: false,
-      config:null
+      config: null
     })
     console.log('onCreateFail')
     console.log(error);
@@ -610,7 +614,7 @@ export default class Index extends Component {
             )
           }
         </View>
-       </View>
+      </View>
     )
   }
 }

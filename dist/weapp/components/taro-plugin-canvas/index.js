@@ -26,6 +26,7 @@ export default class CanvasDrawer extends Component {
       pxHeight: 0,
       debug: false,
       factor: 0,
+      pixelRatio: 1,
     }
     this.canvasId = randomString(10);
     this.ctx = null;
@@ -59,9 +60,9 @@ export default class CanvasDrawer extends Component {
    */
   toPx = (rpx, int, factor = this.state.factor) => {
     if (int) {
-      return parseInt(rpx * factor);
+      return parseInt(rpx * factor * this.state.pixelRatio);
     }
-    return rpx * factor;
+    return rpx * factor * this.state.pixelRatio;
   }
   /**
    * @description px => rpx
@@ -82,29 +83,29 @@ export default class CanvasDrawer extends Component {
    * @param  {} image
    * @param  {} index
    */
-  _downloadImageAndInfo = (image, index) => {
+  _downloadImageAndInfo = (image, index, pixelRatio) => {
     return new Promise((resolve, reject) => {
-      downloadImageAndInfo(image, index, this.toRpx)
-      .then(
-        (result) => {
-          this.drawArr.push(result);
-          resolve();
-        }
-      )
-      .catch(err => {
-        console.log(err);
-        reject(err)
-      });
+      downloadImageAndInfo(image, index, this.toRpx, pixelRatio)
+        .then(
+          (result) => {
+            this.drawArr.push(result);
+            resolve();
+          }
+        )
+        .catch(err => {
+          console.log(err);
+          reject(err)
+        });
     })
   }
   /**
    * @param  {} images=[]
    */
-  downloadResource = (images = []) => {
+  downloadResource = ({ images = [], pixelRatio = 1 }) => {
     const drawList = [];
     let imagesTemp = images;
 
-    imagesTemp.forEach((image, index) => drawList.push(this._downloadImageAndInfo(image, index)));
+    imagesTemp.forEach((image, index) => drawList.push(this._downloadImageAndInfo(image, index, pixelRatio)));
 
     return Promise.all(drawList);
   }
@@ -116,7 +117,7 @@ export default class CanvasDrawer extends Component {
     const { config } = this.props;
     return new Promise((resolve, reject) => {
       if (config.images && config.images.length > 0) {
-        this.downloadResource(config.images || [])
+        this.downloadResource(config || {})
           .then(() => {
             resolve();
           })
@@ -125,7 +126,7 @@ export default class CanvasDrawer extends Component {
             reject(e)
           });
       } else {
-        setTimeout(()=>{
+        setTimeout(() => {
           resolve(1);
         }, 500)
       }
@@ -152,7 +153,7 @@ export default class CanvasDrawer extends Component {
   onCreate = () => {
     const { onCreateFail, config } = this.props;
     Taro.showLoading({ mask: true, title: '生成中...' });
-      return this.downloadResourceTransit()
+    return this.downloadResourceTransit()
       .then(() => {
         this.create(config);
       })
@@ -173,6 +174,10 @@ export default class CanvasDrawer extends Component {
   create = (config) => {
     this.ctx = Taro.createCanvasContext(this.canvasId, this.$scope);
     const height = getHeight(config);
+    // 设置 pixelRatio
+    this.setState({
+      pixelRatio: config.pixelRatio || 1,
+    });
     this.initCanvas(config.width, height, config.debug)
       .then(() => {
         // 设置画布底色
@@ -214,13 +219,13 @@ export default class CanvasDrawer extends Component {
             toRpx: this.toRpx,
           }
           if (item.type === 'image') {
-            drawImage(item,drawOptions)
+            drawImage(item, drawOptions)
           } else if (item.type === 'text') {
-            drawText(item,drawOptions)
+            drawText(item, drawOptions)
           } else if (item.type === 'block') {
-            drawBlock(item,drawOptions)
+            drawBlock(item, drawOptions)
           } else if (item.type === 'line') {
-            drawLine(item,drawOptions)
+            drawLine(item, drawOptions)
           }
         });
 
@@ -273,7 +278,7 @@ export default class CanvasDrawer extends Component {
 
   render() {
     const { pxWidth, pxHeight, debug } = this.state;
-    if(pxWidth && pxHeight){
+    if (pxWidth && pxHeight) {
       return (
         <Canvas
           canvas-id={this.canvasId}

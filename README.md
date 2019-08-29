@@ -84,7 +84,9 @@ import TaroCanvasDrawer from '../../component/taro-plugin-canvas';
 | blocks          | Object Array（对象数组） | 否   | 看下文                                     |
 | texts           | Object Array（对象数组） | 否   | 看下文                                     |
 | images          | Object Array（对象数组） | 否   | 看下文                                     |
-| lines           | Object Array（对象数组） | 否   | 看下文                                     |
+| lines           | Object Array（对象数组） | 否   | 看下文      
+
+| pixelRatio      | Number                   | 否   | 1为一般，值越大越清晰 |                               |
 
 
 

@@ -26,6 +26,7 @@ export default class CanvasDrawer extends Component {
       pxHeight: 0,
       debug: false,
       factor: 0,
+      pixelRatio: 1,
     }
     this.canvasId = randomString(10);
     this.ctx = null;
@@ -59,9 +60,9 @@ export default class CanvasDrawer extends Component {
    */
   toPx = (rpx, int, factor = this.state.factor) => {
     if (int) {
-      return parseInt(rpx * factor);
+      return parseInt(rpx * factor * this.state.pixelRatio);
     }
-    return rpx * factor;
+    return rpx * factor * this.state.pixelRatio;
   }
   /**
    * @description px => rpx
@@ -82,9 +83,9 @@ export default class CanvasDrawer extends Component {
    * @param  {} image
    * @param  {} index
    */
-  _downloadImageAndInfo = (image, index) => {
+  _downloadImageAndInfo = (image, index, pixelRatio) => {
     return new Promise((resolve, reject) => {
-      downloadImageAndInfo(image, index, this.toRpx)
+      downloadImageAndInfo(image, index, this.toRpx, pixelRatio)
         .then(
           (result) => {
             this.drawArr.push(result);
@@ -100,11 +101,11 @@ export default class CanvasDrawer extends Component {
   /**
    * @param  {} images=[]
    */
-  downloadResource = (images = []) => {
+  downloadResource = ({ images = [], pixelRatio = 1 }) => {
     const drawList = [];
     let imagesTemp = images;
 
-    imagesTemp.forEach((image, index) => drawList.push(this._downloadImageAndInfo(image, index)));
+    imagesTemp.forEach((image, index) => drawList.push(this._downloadImageAndInfo(image, index, pixelRatio)));
 
     return Promise.all(drawList);
   }
@@ -116,7 +117,7 @@ export default class CanvasDrawer extends Component {
     const { config } = this.props;
     return new Promise((resolve, reject) => {
       if (config.images && config.images.length > 0) {
-        this.downloadResource(config.images || [])
+        this.downloadResource(config || {})
           .then(() => {
             resolve();
           })
@@ -173,6 +174,10 @@ export default class CanvasDrawer extends Component {
   create = (config) => {
     this.ctx = Taro.createCanvasContext(this.canvasId, this.$scope);
     const height = getHeight(config);
+    // 设置 pixelRatio
+    this.setState({
+      pixelRatio: config.pixelRatio || 1,
+    });
     this.initCanvas(config.width, height, config.debug)
       .then(() => {
         // 设置画布底色
