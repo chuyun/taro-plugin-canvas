@@ -83,70 +83,87 @@ export function _getTextWidth(text, drawOptions) {
   * @param { function } drawOptions.toPx - toPx方法
   * @param { function } drawOptions.toRpx - toRpx方法
   */
-  export function _drawSingleText(drawData, drawOptions) {
-    const { x, y, fontSize, color, baseLine, textAlign = 'left', text, opacity = 1, textDecoration = 'none',
-      width, lineNum = 1, lineHeight = 0, fontWeight = 'normal', fontStyle = 'normal', fontFamily = "sans-serif" } = drawData;
-    const { ctx, toPx, toRpx } = drawOptions;
-    ctx.save();
-    ctx.beginPath();
-    ctx.font = fontStyle + " " + fontWeight + " " + toPx(fontSize, true) + "px " + fontFamily
-    ctx.setGlobalAlpha(opacity);
-    // ctx.setFontSize(toPx(fontSize));
-    ctx.setFillStyle(color);
-    ctx.setTextBaseline(baseLine);
-    ctx.setTextAlign(textAlign);
-    let textWidth = toRpx(ctx.measureText(text).width);
-    const textArr = [];
-    if (textWidth > width) {
-      // 文本宽度 大于 渲染宽度
-      let fillText = '';
-      let line = 1;
-      for (let i = 0; i <= text.length - 1; i++) {  // 将文字转为数组，一行文字一个元素
-        fillText = fillText + text[i];
-        if (toRpx(ctx.measureText(fillText).width) >= width) {
-          if (line === lineNum) {
-            if (i !== text.length - 1) {
-              fillText = fillText.substring(0, fillText.length - 1) + '...';
-            }
+export function _drawSingleText(drawData, drawOptions) {
+  const { x, y, fontSize, color, baseLine, textAlign = 'left', text, opacity = 1, textDecoration = 'none',
+    width, lineNum = 1, lineHeight = 0, fontWeight = 'normal', fontStyle = 'normal', fontFamily = "sans-serif" } = drawData;
+  const { ctx, toPx, toRpx } = drawOptions;
+  ctx.save();
+  ctx.beginPath();
+  ctx.font = fontStyle + " " + fontWeight + " " + toPx(fontSize, true) + "px " + fontFamily
+  ctx.setGlobalAlpha(opacity);
+  // ctx.setFontSize(toPx(fontSize));
+  ctx.setFillStyle(color);
+  ctx.setTextBaseline(baseLine);
+  ctx.setTextAlign(textAlign);
+  let textWidth = toRpx(ctx.measureText(text).width);
+  const textArr = [];
+  if (textWidth > width) {
+    // 文本宽度 大于 渲染宽度
+    let fillText = '';
+    let line = 1;
+    for (let i = 0; i <= text.length - 1; i++) {  // 将文字转为数组，一行文字一个元素
+      fillText = fillText + text[i];
+      if (toRpx(ctx.measureText(fillText).width) >= width) {
+        if (line === lineNum) {
+          if (i !== text.length - 1) {
+            fillText = fillText.substring(0, fillText.length - 1) + '...';
           }
-          if (line <= lineNum) {
+        }
+        if (line <= lineNum) {
+          textArr.push(fillText);
+        }
+        fillText = '';
+        line++;
+      } else {
+        if (line <= lineNum) {
+          if (i === text.length - 1) {
             textArr.push(fillText);
-          }
-          fillText = '';
-          line++;
-        } else {
-          if (line <= lineNum) {
-            if (i === text.length - 1) {
-              textArr.push(fillText);
-            }
           }
         }
       }
-      textWidth = width;
-    } else {
-      textArr.push(text);
     }
-
-    textArr.forEach((item, index) => {
-      ctx.fillText(item, toPx(x), toPx(y + (lineHeight || fontSize) * index));
-    })
-    ctx.restore();
-    // textDecoration
-    if (textDecoration !== 'none') {
-      let lineY = y;
-      if (textDecoration === 'line-through') {
-        // 目前只支持贯穿线
-        lineY = y;
-      }
-      ctx.save();
-      ctx.moveTo(toPx(x), toPx(lineY));
-      ctx.lineTo(toPx(x) + toPx(textWidth), toPx(lineY));
-      ctx.setStrokeStyle(color);
-      ctx.stroke();
-      ctx.restore();
-    }
-    return textWidth;
+    textWidth = width;
+  } else {
+    textArr.push(text);
   }
+
+  textArr.forEach((item, index) => {
+    ctx.fillText(item, toPx(x), toPx(y + (lineHeight || fontSize) * index));
+  })
+  ctx.restore();
+  // textDecoration
+  if (textDecoration !== 'none') {
+    let lineY = y;
+    if (textDecoration === 'line-through') {
+      // 目前只支持贯穿线
+      lineY = y;
+      // 小程序画布baseLine偏移阈值
+      let threshold = 5;
+
+      // 根据baseLine的不同对贯穿线的Y坐标做相应调整
+      switch (baseLine) {
+        case 'top':
+          lineY += fontSize / 2 + threshold;
+          break;
+        case 'middle':
+          break;
+        case 'bottom':
+          lineY -= fontSize / 2 + threshold;
+          break;
+        default:
+          lineY -= fontSize / 2 - threshold;
+          break;
+      }
+    }
+    ctx.save();
+    ctx.moveTo(toPx(x), toPx(lineY));
+    ctx.lineTo(toPx(x) + toPx(textWidth), toPx(lineY));
+    ctx.setStrokeStyle(color);
+    ctx.stroke();
+    ctx.restore();
+  }
+  return textWidth;
+}
 
 /**
  * 渲染文字
