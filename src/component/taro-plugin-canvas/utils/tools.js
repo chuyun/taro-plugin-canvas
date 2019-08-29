@@ -94,7 +94,7 @@ export function mapHttpToHttps(rawUrl) {
  */
 export function downImage(imageUrl) {
   return new Promise((resolve, reject) => {
-    if (/^http/.test(imageUrl) && !new RegExp(wx.env.USER_DATA_PATH).test(imageUrl)) {
+    if (/^http/.test(imageUrl) && !new RegExp(wx && wx.env.USER_DATA_PATH).test(imageUrl)) {
       Taro.downloadFile({
         // url: (imageUrl),
         // TODO
