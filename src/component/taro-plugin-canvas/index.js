@@ -152,7 +152,9 @@ export default class CanvasDrawer extends Component {
    */
   onCreate = () => {
     const { onCreateFail, config } = this.props;
-    Taro.showLoading({ mask: true, title: '生成中...' });
+    if(config['hide-loading']===false){
+      Taro.showLoading({ mask: true, title: '生成中...' });
+    }
     return this.downloadResourceTransit()
       .then(() => {
         this.create(config);
