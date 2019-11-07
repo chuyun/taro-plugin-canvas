@@ -155,6 +155,7 @@ export default class CanvasDrawer extends Component {
     if(config['hide-loading']===false){
       Taro.showLoading({ mask: true, title: '生成中...' });
     }
+    
     return this.downloadResourceTransit()
       .then(() => {
         this.create(config);
