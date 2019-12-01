@@ -1,0 +1,57 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "es6",
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true,
+    "outDir": "dist/weapp",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strictNullChecks": true,
+    "sourceMap": false,
+    "baseUrl": ".",
+    // "rootDir": ".",
+    "jsx": "preserve",
+    "jsxFactory": "Taro.createElement",
+    "allowJs": false,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationDir": "./dist/@types",
+    "typeRoots": [
+      "node_modules/@types",
+      "global.d.ts",
+      "./src/component/taro-plugin-canvas/types.ts",
+    ],
+    "paths": {
+      "components": [
+        "./src/components/index.ts"
+      ],
+      "components/*": [
+        "./src/components/*"
+      ],
+      "models": [
+        "./src/models/index.ts"
+      ],
+      "utils/*": [
+        "./src/utils/*"
+      ],
+      "package": [
+        "./package.json"
+      ]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "include": [
+    "src/components/*",
+    "src/index.ts",
+    "src/component/taro-plugin-canvas/types.ts"
+  ],
+  "compileOnSave": false
+}

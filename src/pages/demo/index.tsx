@@ -1,17 +1,24 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Button, Image } from '@tarojs/components'
-
 import TaroCanvasDrawer from '../../component/taro-plugin-canvas'; // 拷贝文件到component的引入方式
-
 // import { TaroCanvasDrawer  } from 'taro-plugin-canvas'; // npm 引入方式
+import { IConfig } from 'src/component/taro-plugin-canvas/types';
+import './index.scss';
 
-import './index.scss'
+interface IProps {
 
-export default class Index extends Component {
+}
 
-  config = {
-    navigationBarTitleText: '首页'
-  }
+interface IState {
+  config: any | null;
+  shareImage: null | string;
+  canvasStatus: boolean;
+  jdConfig: IConfig;
+  demoConfig: IConfig;
+  rssConfig: IConfig;
+}
+
+export default class Index extends Component<IProps, IState> {
   constructor(props) {
     super(props);
     this.state = {
@@ -23,7 +30,7 @@ export default class Index extends Component {
         height: 1334,
         backgroundColor: '#fff',
         debug: false,
-        pixelRatio: 1,
+        pixelRatio: 2,
         blocks: [
           {
             width: 690,
@@ -146,28 +153,28 @@ export default class Index extends Component {
             x: 30,
             y: 30,
             borderRadius: 62,
-            url: 'https://s.newscdn.cn/file/2019/05/f82a7217-f0e9-46d5-9869-92d62b5d3a19.png',
+            url: 'https://s.newscdn.cn/file/2019/09/108f81fd-4e0b-4317-87fb-7b4c23264767.jpg',
           },
           {
             width: 634,
             height: 634,
             x: 59,
             y: 210,
-            url: 'https://s.newscdn.cn/file/2019/05/f82a7217-f0e9-46d5-9869-92d62b5d3a19.png',
+            url: 'https://s.newscdn.cn/file/2019/09/9881fa55-65f7-430b-b335-671d1c4febd6.jpg',
           },
           {
             width: 220,
             height: 220,
             x: 92,
             y: 1020,
-            url: 'https://s.newscdn.cn/file/2019/05/f82a7217-f0e9-46d5-9869-92d62b5d3a19.png',
+            url: 'https://pic.juncao.cc/cms/images/minapp.jpg',
           },
           {
             width: 750,
             height: 90,
             x: 0,
             y: 1244,
-            url: 'https://s.newscdn.cn/file/2019/05/f82a7217-f0e9-46d5-9869-92d62b5d3a19.png',
+            url: 'https://s.newscdn.cn/file/2019/05/f91ad75e-d1db-44f6-9bd5-71a44fc74971.jpg',
           }
         ]
 
@@ -289,7 +296,7 @@ export default class Index extends Component {
         height: 750,
         backgroundColor: '#fff',
         debug: false,
-        pixelRatio: 1,
+        pixelRatio: 0.1,
         blocks: [
           {
             x: 0,
@@ -394,106 +401,6 @@ export default class Index extends Component {
         ]
 
       },
-
-      wxConfig: {
-        width: 200,
-        height: 200,
-        backgroundColor: '#F2F3F2',
-        debug: false,
-        pixelRatio: 1,
-        blocks: [
-          {
-            x: 20,
-            y: 80,
-            width: 100,
-            height: 100,
-            paddingLeft: 0,
-            paddingRight: 0,
-            borderWidth: 2,
-            borderColor: '#E7E7E7',
-            backgroundColor: '#F2F3F2',
-            borderRadius: 60,
-          },
-          {
-            x: 20,
-            y: 100,
-            width: 100,
-            height: 100,
-            paddingLeft: 0,
-            paddingRight: 0,
-            backgroundColor: '#fff',
-            borderRadius: 60,
-          },
-          {
-            x: 20,
-            y: 100,
-            width: 10,
-            height: 20,
-            paddingLeft: 0,
-            paddingRight: 0,
-            backgroundColor: '#fff',
-            borderRadius: 0,
-          },
-        ],
-        texts: [
-          {
-            x: 100,
-            y: 60,
-            text: '京门风月',
-            fontSize: 48,
-            fontFamily: 'STSong',
-            color: '#000',
-            opacity: 1,
-            baseLine: 'middle',
-            lineHeight: 48,
-            lineNum: 2,
-            textAlign: 'center',
-            width: 100,
-            zIndex: 99,
-          },
-          {
-            x: 80,
-            y: 20,
-            text: '测试赛',
-            fontFamily: 'STSong',
-            fontSize: 32,
-            color: '#1B88ED',
-            opacity: 1,
-            baseLine: 'middle',
-            lineHeight: 48,
-            lineNum: 2,
-            textAlign: 'center',
-            width: 200,
-            zIndex: 999,
-          },
-        ],
-        images: [
-          // {
-          //   url: 'https://pic.juncao.cc/temp/IMG_1294.JPG',
-          //   width: 290,
-          //   height: 420,
-          //   y: 170,
-          //   x: 230,
-          //   borderRadius: 12,
-          //   zIndex: 10,
-          //   // borderRadius: 150,
-          //   // borderWidth: 10,
-          //   // borderColor: 'red',
-          // },
-
-        ],
-        lines: [
-          {
-            startY: 40,
-            startX: 80,
-            endX: 70,
-            endY: 40,
-            width: 1,
-            color: '#eee',
-          }
-
-        ],
-      }
     }
   }
 
@@ -502,6 +409,10 @@ export default class Index extends Component {
   componentDidMount() { }
 
   componentWillUnmount() { }
+
+  config = {
+    navigationBarTitleText: '首页'
+  }
 
   componentDidShow() { }
 
@@ -553,10 +464,10 @@ export default class Index extends Component {
   }
 
 
-  saveToAlbum = () => {
+  saveToAlbum = async () => {
     // 保存图片至本地
-    const res = Taro.saveImageToPhotosAlbum({
-      filePath: this.state.shareImage,
+    const res = await Taro.saveImageToPhotosAlbum({
+      filePath: this.state.shareImage!,
     });
     if (res.errMsg === 'saveImageToPhotosAlbum:ok') {
       Taro.showToast({
@@ -588,7 +499,6 @@ export default class Index extends Component {
             <Button onClick={this.canvasDrawFunc.bind(this, this.state.rssConfig)} >绘制1</Button>
             <Button onClick={this.canvasDrawFunc.bind(this, this.state.jdConfig)} >绘制2</Button>
             <Button onClick={this.canvasDrawFunc.bind(this, this.state.demoConfig)} >绘制3</Button>
-            <Button onClick={this.canvasDrawFunc.bind(this, this.state.wxConfig)} >绘制4</Button>
           </View>
           <View className='flex-row'>
             <Button onClick={this.saveToAlbum}>保存到相册</Button>
@@ -600,7 +510,7 @@ export default class Index extends Component {
         <View className='shareImage-cont'>
           <Image
             className='shareImage'
-            src={this.state.shareImage}
+            src={this.state.shareImage!}
             mode='widthFix'
             lazy-load
           />

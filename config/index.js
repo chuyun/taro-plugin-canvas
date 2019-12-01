@@ -1,6 +1,8 @@
+const path = require('path');
+
 const config = {
-  projectName: 'taro-plugin-canvas',
-  date: '2019-3-12',
+  projectName: 'taro-cli-demo',
+  date: '2019-11-18',
   designWidth: 750,
   deviceRatio: {
     '640': 2.34 / 2,
@@ -8,7 +10,7 @@ const config = {
     '828': 1.81 / 2
   },
   sourceRoot: 'src',
-  outputRoot: 'build/weapp',
+  outputRoot: 'build',
   plugins: {
     babel: {
       sourceMap: true,
@@ -31,6 +33,12 @@ const config = {
     ],
     options: {
     }
+  },
+  alias: {
+    components: path.resolve(__dirname, '..', 'src/components'),
+    models: path.resolve(__dirname, '..', 'src/models'),
+    utils: path.resolve(__dirname, '..', 'src/utils'),
+    package: path.resolve(__dirname, '..', 'package.json'),
   },
   weapp: {
     module: {
@@ -92,6 +100,34 @@ const config = {
       }
     }
   }
+}
+
+if (process.env.TARO_BUILD_TYPE === 'ui') {
+  Object.assign(config.h5, {
+    enableSourceMap: false,
+    enableExtract: false,
+    enableDll: false
+  });
+
+  config.h5.webpackChain = chain => {
+    chain.plugins.delete('htmlWebpackPlugin');
+    chain.plugins.delete('addAssetHtmlWebpackPlugin');
+    chain.merge({
+      output: {
+        path: path.join(process.cwd(), 'dist', 'h5'),
+        filename: 'index.js',
+        libraryTarget: 'umd',
+        library: 'taro-list-view'
+      },
+      externals: {
+        nervjs: 'commonjs2 nervjs',
+        classnames: 'commonjs2 classnames',
+        '@tarojs/components': 'commonjs2 @tarojs/components',
+        '@tarojs/taro-h5': 'commonjs2 @tarojs/taro-h5',
+        weui: 'commonjs2 weui'
+      }
+    });
+  };
 }
 
 module.exports = function (merge) {

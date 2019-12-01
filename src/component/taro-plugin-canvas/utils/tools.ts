@@ -1,12 +1,12 @@
 import Taro from '@tarojs/taro';
-
+import { IConfig } from '../types';
 /**
  * @description 生成随机字符串
  * @param  { number } length - 字符串长度
  * @returns { string }
  */
-export function randomString(length) {
-  var str = Math.random().toString(36).substr(2);
+export const randomString = (length: number) => {
+  let str = Math.random().toString(36).substr(2);
   if (str.length >= length) {
     return str.substr(0, length);
   }
@@ -19,7 +19,7 @@ export function randomString(length) {
  * @param  {} config
  * @returns { number }
  */
-export function getHeight(config) {
+export const getHeight = (config: IConfig) => {
   const getTextHeight = (text) => {
     let fontHeight = text.lineHeight || text.fontSize;
     let height = 0;
@@ -32,21 +32,14 @@ export function getHeight(config) {
     }
     return height;
   }
-  const heightArr = [];
+  const heightArr: number[] = [];
   (config.blocks || []).forEach((item) => {
     heightArr.push(item.y + item.height);
   });
   (config.texts || []).forEach((item) => {
     let height;
-    if (Object.prototype.toString.call(item.text) === '[object Array]') {
-      item.text.forEach((i) => {
-        height = getTextHeight({ ...i, baseLine: item.baseLine });
-        heightArr.push(item.y + height);
-      });
-    } else {
-      height = getTextHeight(item);
-      heightArr.push(item.y + height);
-    }
+    height = getTextHeight(item);
+    heightArr.push(item.y + height);
   });
   (config.images || []).forEach((item) => {
     heightArr.push(item.y + item.height);
@@ -73,7 +66,7 @@ export function getHeight(config) {
  * @param {String}} rawUrl 图片资源url
  * @returns { string }
  */
-export function mapHttpToHttps(rawUrl) {
+export function mapHttpToHttps(rawUrl: string) {
   if (rawUrl.indexOf(':') < 0) {
     return rawUrl;
   }
@@ -92,9 +85,15 @@ export function mapHttpToHttps(rawUrl) {
  * @param { string } imageUrl
  * @returns  { Promise }
  */
-export function downImage(imageUrl) {
-  return new Promise((resolve, reject) => {
-    if (/^http/.test(imageUrl) && !new RegExp(wx.env.USER_DATA_PATH).test(imageUrl)) {
+export function downImage(imageUrl: string) {
+  return new Promise<string>((resolve, reject) => {
+    // if (/^http/.test(imageUrl) && !new RegExp(wx.env.USER_DATA_PATH).test(imageUrl))
+    if (
+      /^http/.test(imageUrl) &&
+      // @ts-ignore
+      !new RegExp((wx as any).env.USER_DATA_PATH).test(imageUrl) &&
+      !/^http:\/\/tmp/.test(imageUrl)
+    ) {
       Taro.downloadFile({
         // url: (imageUrl),
         // TODO
@@ -117,6 +116,12 @@ export function downImage(imageUrl) {
   });
 }
 
+export interface IMageInfo {
+  imgPath: string;
+  imgInfo: any;
+  index: number | string;
+}
+
 
 /**
  * 获取图片信息
@@ -124,21 +129,23 @@ export function downImage(imageUrl) {
  * @param {*} index
  * @returns  { Promise }
  */
-export function getImageInfo(imgPath, index) {
-  return new Promise((resolve, reject) => {
+export function getImageInfo(imgPath: string, index: string) {
+  return new Promise<IMageInfo>((resolve, reject) => {
     Taro.getImageInfo({
-      src: imgPath,
-      success(res) {
-        resolve({ imgPath, imgInfo: res, index });
-      },
-      fail(err) {
+      src: imgPath
+    })
+      .then(res => {
+        resolve({
+          imgPath,
+          imgInfo: res,
+          index
+        });
+      })
+      .catch(err => {
         reject(err);
-      },
-    });
+      })
   });
 }
-
-
 
 /**
 * @description 下载图片并获取图片信息
@@ -147,11 +154,11 @@ export function getImageInfo(imgPath, index) {
 * @returns  { Promise }
 */
 export function downloadImageAndInfo(image, index, toRpxFunc, pixelRatio) {
-  return new Promise((resolve, reject) => {
+  return new Promise<any>((resolve, reject) => {
     const { x, y, url, zIndex } = image;
     const imageUrl = url;
     // 下载图片
-    downImage(imageUrl, index)
+    downImage(imageUrl)
       // 获取图片信息
       .then(imgPath => getImageInfo(imgPath, index))
       .then(({ imgPath, imgInfo }) => {

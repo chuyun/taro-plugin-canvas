@@ -1,3 +1,21 @@
+
+import { CanvasContext } from "@tarojs/taro";
+import { IText, IIMage, ILine, IBlock } from '../types';
+
+export interface IDrawRadiusRectData {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  r: number;
+}
+
+export interface IDrawOptions {
+  ctx: CanvasContext;
+  toPx: (rpx: number, int?: boolean, factor?: number) => number;
+  toRpx: (px: number, int?: boolean, factor?: number) => number;
+}
+
 /**
   * @description 绘制圆角矩形
   * @param { object } drawData - 绘制数据
@@ -6,13 +24,8 @@
   * @param { number } drawData.w - 矩形的宽
   * @param { number } drawData.h - 矩形的高
   * @param { number } drawData.r - 圆角半径
-  *
-  * @param { object } drawOptions - 绘制对象
-  * @param { object } drawOptions.ctx - ctx对象
-  * @param { function } drawOptions.toPx - toPx方法
-  * @param { function } drawOptions.toRpx - toRpx方法
   */
-export function _drawRadiusRect(drawData, drawOptions) {
+export function _drawRadiusRect(drawData: IDrawRadiusRectData, drawOptions: IDrawOptions) {
   const { x, y, w, h, r } = drawData;
   const {
     ctx,
@@ -32,28 +45,34 @@ export function _drawRadiusRect(drawData, drawOptions) {
   ctx.arc(toPx(x + br), toPx(y + br), toPx(br), 2 * Math.PI * (2 / 4), 2 * Math.PI * (3 / 4))
 }
 
+
 /**
  * @description 计算文本长度
  * @param { Array | Object } text 数组 或者 对象
- *
- * @param { object } drawOptions - 绘制对象
- * @param { object } drawOptions.ctx - ctx对象
- * @param { function } drawOptions.toPx - toPx方法
- * @param { function } drawOptions.toRpx - toRpx方法
  */
-export function _getTextWidth(text, drawOptions) {
+export function _getTextWidth(_text: IText | IText[], drawOptions: IDrawOptions): number {
   const { ctx, toPx, toRpx } = drawOptions;
-  let texts = [];
-  if (Object.prototype.toString.call(text) === '[object Object]') {
-    texts.push(text);
+  let texts: IText[] = [];
+  if (Array.isArray(_text)) {
+    texts = _text;
   } else {
-    texts = text;
+    texts.push(_text);
   }
   let width = 0;
-  // eslint-disable-next-line no-shadow
-  texts.forEach(({ fontSize, text, marginLeft = 0, marginRight = 0 }) => {
+  texts.forEach(({
+    fontSize,
+    text,
+    marginLeft = 0,
+    marginRight = 0
+  }) => {
     ctx.setFontSize(toPx(fontSize));
-    width += ctx.measureText(text).width + marginLeft + marginRight;
+    let _textWidth = 0;
+    if (typeof text === 'object') {
+      _textWidth = ctx.measureText(text.text).width + text.marginLeft + text.marginRight;
+    } else {
+      _textWidth = ctx.measureText(text).width;
+    }
+    width += _textWidth + marginLeft + marginRight;
   })
   return toRpx(width);
 }
@@ -77,35 +96,35 @@ export function _getTextWidth(text, drawOptions) {
   * @param { string } [drawData.fontWeight='normal'] - 'bold' 加粗字体，目前小程序不支持 100 - 900 加粗
   * @param { string } [drawData.fontStyle='normal'] - 'italic' 倾斜字体
   * @param { string } [drawData.fontFamily="sans-serif"] - 小程序默认字体为 'sans-serif', 请输入小程序支持的字体
-  *
-  * @param { object } drawOptions - 绘制对象
-  * @param { object } drawOptions.ctx - ctx对象
-  * @param { function } drawOptions.toPx - toPx方法
-  * @param { function } drawOptions.toRpx - toRpx方法
   */
-export function _drawSingleText(drawData, drawOptions) {
+
+interface IDrawSingleTextData extends IText {
+}
+export function _drawSingleText(drawData: IDrawSingleTextData, drawOptions: IDrawOptions) {
   const { x, y, fontSize, color, baseLine, textAlign = 'left', text, opacity = 1, textDecoration = 'none',
-    width, lineNum = 1, lineHeight = 0, fontWeight = 'normal', fontStyle = 'normal', fontFamily = "sans-serif" } = drawData;
-  const { ctx, toPx, toRpx } = drawOptions;
+    width = 0, lineNum = 1, lineHeight = 0, fontWeight = 'normal', fontStyle = 'normal', fontFamily = "sans-serif" } = drawData;
+  const { ctx, toPx } = drawOptions;
   ctx.save();
   ctx.beginPath();
   ctx.font = fontStyle + " " + fontWeight + " " + toPx(fontSize, true) + "px " + fontFamily
   ctx.setGlobalAlpha(opacity);
   // ctx.setFontSize(toPx(fontSize));
-  ctx.setFillStyle(color);
-  ctx.setTextBaseline(baseLine);
+
+  color && ctx.setFillStyle(color);
+  baseLine && ctx.setTextBaseline(baseLine);
   ctx.setTextAlign(textAlign);
-  let textWidth = toRpx(ctx.measureText(text).width);
-  const textArr = [];
-  if (textWidth > width) {
+  let textWidth = (ctx.measureText(text as string).width);
+  const textArr: string[] = [];
+  let drawWidth = toPx(width);
+  if (width && textWidth > drawWidth) {
     // 文本宽度 大于 渲染宽度
     let fillText = '';
     let line = 1;
-    for (let i = 0; i <= text.length - 1; i++) {  // 将文字转为数组，一行文字一个元素
+    for (let i = 0; i <= (text as string).length - 1; i++) {  // 将文字转为数组，一行文字一个元素
       fillText = fillText + text[i];
-      if (toRpx(ctx.measureText(fillText).width) >= width) {
+      if ((ctx.measureText(fillText).width) >= drawWidth) {
         if (line === lineNum) {
-          if (i !== text.length - 1) {
+          if (i !== (text as string).length - 1) {
             fillText = fillText.substring(0, fillText.length - 1) + '...';
           }
         }
@@ -116,7 +135,7 @@ export function _drawSingleText(drawData, drawOptions) {
         line++;
       } else {
         if (line <= lineNum) {
-          if (i === text.length - 1) {
+          if (i === (text as string).length - 1) {
             textArr.push(fillText);
           }
         }
@@ -124,7 +143,7 @@ export function _drawSingleText(drawData, drawOptions) {
     }
     textWidth = width;
   } else {
-    textArr.push(text);
+    textArr.push(text as string);
   }
 
   textArr.forEach((item, index) => {
@@ -158,7 +177,7 @@ export function _drawSingleText(drawData, drawOptions) {
     ctx.save();
     ctx.moveTo(toPx(x), toPx(lineY));
     ctx.lineTo(toPx(x) + toPx(textWidth), toPx(lineY));
-    ctx.setStrokeStyle(color);
+    color && ctx.setStrokeStyle(color);
     ctx.stroke();
     ctx.restore();
   }
@@ -183,13 +202,8 @@ export function _drawSingleText(drawData, drawOptions) {
  * @param { string } [params.fontWeight='normal'] - 'bold' 加粗字体，目前小程序不支持 100 - 900 加粗
  * @param { string } [params.fontStyle='normal'] - 'italic' 倾斜字体
  * @param { string } [params.fontFamily="sans-serif"] - 小程序默认字体为 'sans-serif', 请输入小程序支持的字体
- *
- * @param { object } drawOptions - 绘制对象
- * @param { object } drawOptions.ctx - ctx对象
- * @param { function } drawOptions.toPx - toPx方法
- * @param { function } drawOptions.toRpx - toRpx方法
  */
-export function drawText(params, drawOptions) {
+export function drawText(params: IText, drawOptions: IDrawOptions) {
   // const { ctx, toPx, toRpx } = drawOptions;
   const {
     x,
@@ -202,7 +216,7 @@ export function drawText(params, drawOptions) {
     // lineNum,
     // lineHeight
   } = params;
-  if (Object.prototype.toString.call(text) === '[object Array]') {
+  if (Array.isArray(text)) {
     let preText = { x, y, baseLine };
     text.forEach(item => {
       preText.x += item.marginLeft || 0;
@@ -214,6 +228,16 @@ export function drawText(params, drawOptions) {
   } else {
     _drawSingleText(params, drawOptions);
   }
+}
+
+export interface IDrawImageData extends IIMage {
+  imgPath: string;
+  w: number;
+  h: number;
+  sx: number;
+  sy: number;
+  sw: number;
+  sh: number;
 }
 
 /**
@@ -229,13 +253,8 @@ export function drawText(params, drawOptions) {
  * @param { number } sh - 源图像的矩形选择框的高度
  * @param { number } [borderRadius=0] - 圆角
  * @param { number } [borderWidth=0] - 边框
- *
- * @param { object } drawOptions - 绘制对象
- * @param { object } drawOptions.ctx - ctx对象
- * @param { function } drawOptions.toPx - toPx方法
- * @param { function } drawOptions.toRpx - toRpx方法
  */
-export function drawImage(data, drawOptions) {
+export function drawImage(data: IDrawImageData, drawOptions: IDrawOptions) {
   const { ctx, toPx } = drawOptions;
   const { imgPath, x, y, w, h, sx, sy, sw, sh, borderRadius = 0, borderWidth = 0, borderColor } = data;
   ctx.save();
@@ -250,7 +269,7 @@ export function drawImage(data, drawOptions) {
     ctx.clip();
     ctx.drawImage(imgPath, toPx(sx), toPx(sy), toPx(sw), toPx(sh), toPx(x), toPx(y), toPx(w), toPx(h));
     if (borderWidth > 0) {
-      ctx.setStrokeStyle(borderColor);
+      borderColor && ctx.setStrokeStyle(borderColor);
       ctx.setLineWidth(toPx(borderWidth));
       ctx.stroke();
     }
@@ -268,18 +287,13 @@ export function drawImage(data, drawOptions) {
  * @param  { number } endY - 终结坐标
  * @param  { number } width - 线的宽度
  * @param  { string } [color] - 线的颜色
- *
- * @param { object } drawOptions - 绘制对象
- * @param { object } drawOptions.ctx - ctx对象
- * @param { function } drawOptions.toPx - toPx方法
- * @param { function } drawOptions.toRpx - toRpx方法
  */
-export function drawLine(drawData, drawOptions) {
+export function drawLine(drawData: ILine, drawOptions: IDrawOptions) {
   const { startX, startY, endX, endY, color, width } = drawData;
   const { ctx, toPx } = drawOptions;
   ctx.save();
   ctx.beginPath();
-  ctx.setStrokeStyle(color);
+  color && ctx.setStrokeStyle(color);
   ctx.setLineWidth(toPx(width));
   ctx.moveTo(toPx(startX), toPx(startY));
   ctx.lineTo(toPx(endX), toPx(endY));
@@ -303,20 +317,18 @@ export function drawLine(drawData, drawOptions) {
 * @param  { number } [borderRadius=0] - 圆角
 * @param  { number } [opacity=1] - 透明度
 *
-* @param { object } drawOptions - 绘制对象
-* @param { object } drawOptions.ctx - ctx对象
-* @param { function } drawOptions.toPx - toPx方法
-* @param { function } drawOptions.toRpx - toRpx方法
 */
-export function drawBlock({ text, width = 0, height, x, y, paddingLeft = 0, paddingRight = 0, borderWidth, backgroundColor, borderColor, borderRadius = 0, opacity = 1 }, drawOptions) {
+export function drawBlock(blockData: IBlock, drawOptions: IDrawOptions) {
   const { ctx, toPx, } = drawOptions;
+  const { text, width = 0, height, x, y, paddingLeft = 0, paddingRight = 0, borderWidth, backgroundColor, borderColor, borderRadius = 0, opacity = 1 } = blockData;
   // 判断是否块内有文字
   let blockWidth = 0; // 块的宽度
   let textX = 0;
   let textY = 0;
   if (typeof text !== 'undefined') {
     // 如果有文字并且块的宽度小于文字宽度，块的宽度为 文字的宽度 + 内边距
-    const textWidth = _getTextWidth(typeof text.text === 'string' ? text : text.text, drawOptions);
+    // const textWidth = _getTextWidth(typeof text.text === 'string' ? text : text.text, drawOptions);
+    const textWidth: number = _getTextWidth(text, drawOptions);
     blockWidth = textWidth > width ? textWidth : width;
     blockWidth += paddingLeft + paddingLeft;
 
@@ -358,7 +370,7 @@ export function drawBlock({ text, width = 0, height, x, y, paddingLeft = 0, padd
     // 画线
     ctx.save();
     ctx.setGlobalAlpha(opacity);
-    ctx.setStrokeStyle(borderColor);
+    borderColor && ctx.setStrokeStyle(borderColor);
     ctx.setLineWidth(toPx(borderWidth));
     if (borderRadius > 0) {
       // 画圆角矩形边框
