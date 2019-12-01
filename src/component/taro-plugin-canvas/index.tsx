@@ -170,13 +170,15 @@ export default class CanvasDrawer extends Component<ICanvasDrawerProps, ICanvasD
 
   onCreate = () => {
     const { onCreateFail, config } = this.props;
-    Taro.showLoading({ mask: true, title: '生成中...' });
+    if (config['hide-loading'] === false) {
+      Taro.showLoading({ mask: true, title: '生成中...' });
+    }
     return this.downloadResourceTransit()
       .then(() => {
         this.create(config);
       })
       .catch((err) => {
-        Taro.hideLoading();
+        config['hide-loading'] && Taro.hideLoading();
         Taro.showToast({ icon: 'none', title: err.errMsg || '下载图片失败' });
         console.error(err);
         if (!onCreateFail) {
