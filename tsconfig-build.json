@@ -51,7 +51,8 @@
   "include": [
     "src/components/*",
     "src/index.ts",
-    "src/component/taro-plugin-canvas/types.ts"
+    "src/component/taro-plugin-canvas/types.ts",
+    "src/component/**/*"
   ],
   "compileOnSave": false
 }

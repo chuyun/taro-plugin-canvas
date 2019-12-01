@@ -69,7 +69,7 @@ export function downImage(imageUrl) {
             !new RegExp(wx.env.USER_DATA_PATH).test(imageUrl) &&
             !/^http:\/\/tmp/.test(imageUrl)) {
             Taro.downloadFile({
-                url: mapHttpToHttps(imageUrl),
+                url: (imageUrl),
                 success: (res) => {
                     if (res.statusCode === 200) {
                         resolve(res.tempFilePath);

@@ -95,9 +95,9 @@ export function downImage(imageUrl: string) {
       !/^http:\/\/tmp/.test(imageUrl)
     ) {
       Taro.downloadFile({
-        // url: (imageUrl),
+        url: (imageUrl),
         // TODO
-        url: mapHttpToHttps(imageUrl),
+        // url: mapHttpToHttps(imageUrl),
         success: (res) => {
           if (res.statusCode === 200) {
             resolve(res.tempFilePath);

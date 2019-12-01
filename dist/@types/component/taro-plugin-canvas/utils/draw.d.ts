@@ -1,5 +1,4 @@
 import { CanvasContext } from "@tarojs/taro";
-
 import { IText, IIMage, ILine, IBlock } from '../types';
 export interface IDrawRadiusRectData {
     x: number;
