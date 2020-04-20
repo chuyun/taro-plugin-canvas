@@ -101,7 +101,7 @@ export function _getTextWidth(_text: IText | IText[], drawOptions: IDrawOptions)
 interface IDrawSingleTextData extends IText {
 }
 export function _drawSingleText(drawData: IDrawSingleTextData, drawOptions: IDrawOptions) {
-  const { x, y, fontSize, color, baseLine, textAlign = 'left', text, opacity = 1, textDecoration = 'none',
+  let { x, y, fontSize, color, baseLine, textAlign = 'left', text, opacity = 1, textDecoration = 'none',
     width = 0, lineNum = 1, lineHeight = 0, fontWeight = 'normal', fontStyle = 'normal', fontFamily = "sans-serif" } = drawData;
   const { ctx, toPx } = drawOptions;
   ctx.save();
@@ -109,6 +109,9 @@ export function _drawSingleText(drawData: IDrawSingleTextData, drawOptions: IDra
   ctx.font = fontStyle + " " + fontWeight + " " + toPx(fontSize, true) + "px " + fontFamily
   ctx.setGlobalAlpha(opacity);
   // ctx.setFontSize(toPx(fontSize));
+  if (typeof text === 'object') {
+    text = text.text
+  }
 
   color && ctx.setFillStyle(color);
   baseLine && ctx.setTextBaseline(baseLine);
