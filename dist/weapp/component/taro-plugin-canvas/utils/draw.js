@@ -37,12 +37,15 @@ export function _getTextWidth(_text, drawOptions) {
     return toRpx(width);
 }
 export function _drawSingleText(drawData, drawOptions) {
-    const { x, y, fontSize, color, baseLine, textAlign = 'left', text, opacity = 1, textDecoration = 'none', width = 0, lineNum = 1, lineHeight = 0, fontWeight = 'normal', fontStyle = 'normal', fontFamily = "sans-serif" } = drawData;
+    let { x, y, fontSize, color, baseLine, textAlign = 'left', text, opacity = 1, textDecoration = 'none', width = 0, lineNum = 1, lineHeight = 0, fontWeight = 'normal', fontStyle = 'normal', fontFamily = "sans-serif" } = drawData;
     const { ctx, toPx } = drawOptions;
     ctx.save();
     ctx.beginPath();
     ctx.font = fontStyle + " " + fontWeight + " " + toPx(fontSize, true) + "px " + fontFamily;
     ctx.setGlobalAlpha(opacity);
+    if (typeof text === 'object') {
+        text = text.text;
+    }
     color && ctx.setFillStyle(color);
     baseLine && ctx.setTextBaseline(baseLine);
     ctx.setTextAlign(textAlign);
