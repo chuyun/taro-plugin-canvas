@@ -1,8 +1,9 @@
-import Taro, { Component } from '@tarojs/taro'
+import Taro from '@tarojs/taro'
+import React, { Component }  from 'react';
 import { View, Button, Image } from '@tarojs/components'
 import TaroCanvasDrawer from '../../component/taro-plugin-canvas'; // 拷贝文件到component的引入方式
 // import { TaroCanvasDrawer  } from 'taro-plugin-canvas'; // npm 引入方式
-import { IConfig } from 'src/component/taro-plugin-canvas/types';
+import { IConfig } from '../../component/taro-plugin-canvas/types';
 import './index.scss';
 
 interface IProps {
@@ -18,9 +19,9 @@ interface IState {
   rssConfig: IConfig;
 }
 
-export default class Index extends Component<IProps, IState> {
+class Index extends Component<IProps, IState> {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       config: null,
       shareImage: null,
@@ -410,10 +411,6 @@ export default class Index extends Component<IProps, IState> {
 
   componentWillUnmount() { }
 
-  config = {
-    navigationBarTitleText: '首页'
-  }
-
   componentDidShow() { }
 
   componentDidHide() { }
@@ -528,4 +525,6 @@ export default class Index extends Component<IProps, IState> {
     )
   }
 }
+
+export default Index
 
