@@ -1,5 +1,4 @@
-import Taro, { CanvasContext } from '@tarojs/taro';
-import React, { Component } from 'react';
+import Taro, { Component, CanvasContext } from '@tarojs/taro';
 import PropTypes from 'prop-types';
 import { Canvas } from '@tarojs/components';
 import { randomString, getHeight, downloadImageAndInfo } from './utils/tools';

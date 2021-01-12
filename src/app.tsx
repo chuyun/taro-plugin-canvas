@@ -1,5 +1,8 @@
 
-import { Component } from 'react'
+import Taro, { Component, Config } from '@tarojs/taro'
+import '@tarojs/async-await'
+import Index from './pages/index'
+
 import './app.scss'
 
 // 如果需要在 h5 环境中开启 React Devtools
@@ -18,6 +21,18 @@ class App extends Component {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   // eslint-disable-next-line react/sort-comp
+  config: Config = {
+    pages: [
+      'pages/demo/index',
+      'pages/index/index'
+    ],
+    window: {
+      backgroundTextStyle: 'light',
+      navigationBarBackgroundColor: '#fff',
+      navigationBarTitleText: 'WeChat',
+      navigationBarTextStyle: 'black'
+    }
+  }
 
   componentDidMount () {}
 
@@ -30,8 +45,10 @@ class App extends Component {
   // 在 App 类中的 render() 函数没有实际作用
   // 请勿修改此函数
   render () {
-    return this.props.children
+    return (
+      <Index />
+    )
   }
 }
 
-export default App
+Taro.render(<App />, document.getElementById('app'))

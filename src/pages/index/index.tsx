@@ -1,5 +1,4 @@
-import Taro from '@tarojs/taro'
-import React, { Component } from 'react'
+import Taro, { Component } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import './index.scss'
 
@@ -14,6 +13,10 @@ export default class Index extends Component {
    */
 
   // eslint-disable-next-line react/sort-comp
+  config: Taro.Config = {
+    navigationBarTitleText: '首页',
+    navigationBarTextStyle: 'white',
+  }
 
   componentWillMount () { }
 
