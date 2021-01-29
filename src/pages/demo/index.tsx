@@ -1,8 +1,9 @@
-import Taro, { Component } from '@tarojs/taro'
+import React, { Component } from 'react'
+import Taro from '@tarojs/taro'
 import { View, Button, Image } from '@tarojs/components'
 import TaroCanvasDrawer from '../../component/taro-plugin-canvas'; // 拷贝文件到component的引入方式
 // import { TaroCanvasDrawer  } from 'taro-plugin-canvas'; // npm 引入方式
-import { IConfig } from 'src/component/taro-plugin-canvas/types';
+import { IConfig } from '../../component/taro-plugin-canvas/types';
 import './index.scss';
 
 interface IProps {
@@ -260,7 +261,7 @@ export default class Index extends Component<IProps, IState> {
         ],
         images: [
           {
-            url: 'https://lc-I0j7ktVK.cn-n1.lcfile.com/02bb99132352b5b5dcea.jpg',
+            url: 'https://s.newscdn.cn/file/2019/09/9881fa55-65f7-430b-b335-671d1c4febd6.jpg',
             width: 300,
             height: 300,
             y: 450,
@@ -270,7 +271,7 @@ export default class Index extends Component<IProps, IState> {
             // borderColor: 'red',
           },
           {
-            url: 'https://lc-I0j7ktVK.cn-n1.lcfile.com/02bb99132352b5b5dcea.jpg',
+            url: 'https://pic.juncao.cc/cms/images/minapp.jpg',
             width: 100,
             height: 100,
             y: 450,
@@ -485,11 +486,11 @@ export default class Index extends Component<IProps, IState> {
     })
   }
 
-  toSimplePage = () => {
-    Taro.navigateTo({
-      url: '/pages/simple/index'
-    })
-  }
+  // toSimplePage = () => {
+  //   Taro.navigateTo({
+  //     url: '/pages/simple/index'
+  //   })
+  // }
 
   render() {
     return (
@@ -503,7 +504,7 @@ export default class Index extends Component<IProps, IState> {
           <View className='flex-row'>
             <Button onClick={this.saveToAlbum}>保存到相册</Button>
             <Button onClick={this.reset}>重置</Button>
-            <Button onClick={this.toSimplePage}>简易版Demo</Button>
+            {/* <Button onClick={this.toSimplePage}>简易版Demo</Button> */}
           </View>
         </View>
 

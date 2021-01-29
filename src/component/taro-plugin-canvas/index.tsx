@@ -1,4 +1,5 @@
-import Taro, { Component, CanvasContext } from '@tarojs/taro';
+import React, { Component } from 'react'
+import Taro, { CanvasContext } from '@tarojs/taro'
 import PropTypes from 'prop-types';
 import { Canvas } from '@tarojs/components';
 import { randomString, getHeight, downloadImageAndInfo } from './utils/tools';
@@ -144,7 +145,7 @@ export default class CanvasDrawer extends Component<ICanvasDrawerProps, ICanvasD
           pixelRatio: config.pixelRatio || 1,
         })
           .then(() => {
-            resolve();
+            resolve({});
           })
           .catch((e) => {
             // console.log(e);
@@ -189,7 +190,7 @@ export default class CanvasDrawer extends Component<ICanvasDrawerProps, ICanvasD
   }
 
   create = (config) => {
-    this.ctx = Taro.createCanvasContext(this.canvasId, this.$scope);
+    this.ctx = Taro.createCanvasContext(this.canvasId);
     const height = getHeight(config);
     // 设置 pixelRatio
     this.setState({
@@ -286,7 +287,7 @@ export default class CanvasDrawer extends Component<ICanvasDrawerProps, ICanvasD
         }
         onCreateSuccess && onCreateSuccess(result);
       },
-      fail: (error) => {
+      fail: (error: any) => {
         const { errMsg } = error;
         console.log(errMsg)
         if (errMsg === 'canvasToTempFilePath:fail:create bitmap failed') {
@@ -301,7 +302,7 @@ export default class CanvasDrawer extends Component<ICanvasDrawerProps, ICanvasD
           }
         }
       },
-    }, this.$scope);
+    });
   }
 
   render() {
